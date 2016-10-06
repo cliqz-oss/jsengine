@@ -3,6 +3,7 @@ package com.cliqz.v8.api;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.cliqz.v8.JSConsole;
 import com.cliqz.v8.V8Engine;
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Object;
@@ -12,6 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -61,5 +64,30 @@ public class SystemLoaderTest {
             }
         });
         assertTrue(exists);
+    }
+
+    @Test
+    public void testLoaderLoadModuleNotExists() throws Exception {
+        new JSConsole(engine);
+        SystemLoader system = new SystemLoader(engine, InstrumentationRegistry.getTargetContext(), null);
+
+        V8Object module = system.loadModule("nonexistant_module");
+        assertNull(module);
+    }
+
+    @Test
+    public void testLoaderLoadModule() throws Exception {
+        new JSConsole(engine);
+        SystemLoader system = new SystemLoader(engine, InstrumentationRegistry.getTargetContext(), "system_test");
+
+        final V8Object module = system.loadModule("test");
+        assertNotNull(module);
+        engine.queryEngine(new V8Engine.Query<Object>() {
+            @Override
+            public Object query(V8 runtime) {
+                module.release();
+                return null;
+            }
+        });
     }
 }
