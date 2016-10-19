@@ -11,12 +11,19 @@ import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.V8ScriptException;
+import com.eclipsesource.v8.V8Value;
+
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Time;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -144,9 +151,6 @@ public class SystemLoader {
                 if (catchResult != null) {
                     catchResult.release();
                 }
-                if (thenResult != null) {
-                    thenResult.release();
-                }
             }
         }
 
@@ -171,9 +175,6 @@ public class SystemLoader {
                 if (catchResult != null) {
                     catchResult.release();
                 }
-                if (thenResult != null) {
-                    thenResult.release();
-                }
             }
         }
     }
@@ -183,19 +184,7 @@ public class SystemLoader {
             return engine.queryEngine(new V8Engine.Query<V8Object>() {
                 @Override
                 public V8Object query(V8 runtime) {
-                    V8Array moduleArgs = new V8Array(runtime).push(moduleName);
-                    V8Object system = runtime.getObject("System");
-                    try {
-                        PromiseCallback callback = new PromiseCallback(runtime);
-                        callback.attachToPromise(system.executeObjectFunction("import", moduleArgs)).release();
-                        return callback.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        Log.e(TAG, "Error loading module: " + moduleName, e);
-                        return null;
-                    } finally {
-                        moduleArgs.release();
-                        system.release();
-                    }
+                    return loadModuleInternal(moduleName);
                 }
             });
         } catch (InterruptedException | TimeoutException e) {
@@ -204,7 +193,98 @@ public class SystemLoader {
         }
     }
 
-    String readSourceFile(final String assetPath) throws IOException {
+    private V8Object loadModuleInternal(final String moduleName) {
+        V8Array moduleArgs = new V8Array(runtime).push(moduleName);
+        V8Object system = runtime.getObject("System");
+        try {
+            PromiseCallback callback = new PromiseCallback(runtime);
+            callback.attachToPromise(system.executeObjectFunction("import", moduleArgs)).release();
+            return callback.get();
+        } catch (InterruptedException | ExecutionException e) {
+            Log.e(TAG, "Error loading module: " + moduleName, e);
+            return null;
+        } finally {
+            moduleArgs.release();
+            system.release();
+        }
+    }
+
+    public Object callFunctionOnModule(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
+        try {
+            return engine.queryEngine(new V8Engine.Query<Object>() {
+                @Override
+                public Object query(V8 runtime) {
+                    V8Object module = null;
+                    try {
+                        module = loadModuleInternal(modulePath);
+                        // check if this is a valid function name
+                        Set<String> moduleKeys = new HashSet<String>(Arrays.asList(module.getKeys()));
+                        if (!moduleKeys.contains(functionName) || module.getType(functionName) != 7) {
+                            throw new RuntimeException(modulePath + " has no function named "+ functionName);
+                        }
+                        return module.executeJSFunction(functionName, args);
+                    } finally {
+                        if (module != null)
+                            module.release();
+                    }
+                }
+            });
+        } catch (TimeoutException | InterruptedException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    public Object callFunctionOnModuleDefault(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
+        try {
+            return engine.queryEngine(new V8Engine.Query<Object>() {
+                @Override
+                public Object query(V8 runtime) {
+                    V8Object module = null;
+                    V8Object moduleDefault = null;
+                    try {
+                        module = loadModuleInternal(modulePath);
+                        moduleDefault = module.getObject("default");
+                        // check if this is a valid function name
+                        Set<String> moduleKeys = new HashSet<String>(Arrays.asList(moduleDefault.getKeys()));
+                        if (!moduleKeys.contains(functionName) || moduleDefault.getType(functionName) != 7) {
+                            throw new RuntimeException(modulePath + ".default has no function named "+ functionName);
+                        }
+                        final Object fnResult = moduleDefault.executeJSFunction(functionName, args);
+                        if (fnResult instanceof V8Object) {
+                            try {
+                                return jsonifyObject((V8Object) fnResult);
+                            } finally {
+                                ((V8Object) fnResult).release();
+                            }
+                        } else {
+                            return fnResult;
+                        }
+                    } finally {
+                        if (module != null)
+                            module.release();
+                        if (moduleDefault != null)
+                            moduleDefault.release();
+                    }
+                }
+            });
+        } catch(TimeoutException | InterruptedException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    private String jsonifyObject(V8Object obj) {
+        V8Object json = runtime.getObject("JSON");
+        V8Array args = new V8Array(runtime);
+        try {
+            args.push(obj);
+            return json.executeStringFunction("stringify", args);
+        } finally {
+            args.release();
+            json.release();
+        }
+    }
+
+    public String readSourceFile(final String assetPath) throws IOException {
         InputStream stream = null;
         try {
             stream = context.getAssets().open(assetPath);

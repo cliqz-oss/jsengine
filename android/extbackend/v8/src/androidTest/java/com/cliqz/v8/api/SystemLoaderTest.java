@@ -5,17 +5,27 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.cliqz.v8.JSConsole;
 import com.cliqz.v8.V8Engine;
+import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.V8;
+import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by sammacbeth on 04/10/2016.
@@ -25,10 +35,13 @@ import static org.junit.Assert.assertTrue;
 public class SystemLoaderTest {
 
     private V8Engine engine;
+    private SystemLoader system;
 
     @Before
     public void setUp() throws Exception {
         engine = new V8Engine();
+        new JSConsole(engine);
+        system = new SystemLoader(engine, InstrumentationRegistry.getTargetContext(), "system_test");
     }
 
     @After
@@ -38,7 +51,6 @@ public class SystemLoaderTest {
 
     @Test
     public void testLoaderExists() throws Exception {
-        new SystemLoader(engine, InstrumentationRegistry.getTargetContext(), null);
 
         boolean exists = engine.queryEngine(new V8Engine.Query<Boolean>() {
             @Override
@@ -77,9 +89,6 @@ public class SystemLoaderTest {
 
     @Test
     public void testLoaderLoadModule() throws Exception {
-        new JSConsole(engine);
-        SystemLoader system = new SystemLoader(engine, InstrumentationRegistry.getTargetContext(), "system_test");
-
         final V8Object module = system.loadModule("test");
         assertNotNull(module);
         engine.queryEngine(new V8Engine.Query<Object>() {
@@ -89,5 +98,43 @@ public class SystemLoaderTest {
                 return null;
             }
         });
+    }
+
+    @Test
+    public void testLoaderCallMethod() throws Exception {
+        Object result = system.callFunctionOnModule("test", "testfn");
+        assertEquals("fnCalled", result.toString());
+    }
+
+    @Test
+    public void testLoaderCallMethodNotExistant() throws Exception {
+        try {
+            Object result = system.callFunctionOnModule("test", "nonexistant");
+            fail();
+        } catch(ExecutionException e) {
+        }
+    }
+
+    @Test
+    public void testLoaderCallMethodNotAFunction() throws Exception {
+        try {
+            Object result = system.callFunctionOnModule("test", "default");
+            fail();
+        } catch(ExecutionException e) {
+        }
+    }
+
+    @Test
+    public void testLoaderCallMethodOnDefault() throws Exception {
+        Object result = system.callFunctionOnModuleDefault("test", "test");
+        assertEquals(result, "test");
+    }
+
+    @Test
+    public void testLoaderCallMethodOnDefaultReturnJSON() throws Exception {
+        Object result = system.callFunctionOnModuleDefault("test", "test_object");
+        JSONObject jsonResult = new JSONObject(result.toString());
+        assertTrue(jsonResult.has("test"));
+        assertTrue(jsonResult.getBoolean("test"));
     }
 }

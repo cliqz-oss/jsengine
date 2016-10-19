@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
  * Created by sammacbeth on 26/09/2016.
  */
 
-class Timers {
+public class Timers {
 
     private static final String TAG = Timers.class.getSimpleName();
 
@@ -29,7 +29,7 @@ class Timers {
     private final Map<Integer, Pair<V8Function, ScheduledFuture>> timeouts = new HashMap<>();
     private int mTimerCtr = 0;
 
-    Timers(V8Engine runtime) throws JSApiException {
+    public Timers(V8Engine runtime) throws JSApiException {
         this.runtime = runtime;
 
         // add methods to the engine
