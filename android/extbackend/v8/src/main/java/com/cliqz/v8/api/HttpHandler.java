@@ -64,15 +64,15 @@ public class HttpHandler {
         this(engine, HttpRequestPolicy.ALWAYS_ALLOWED);
     }
 
-    private boolean isHttpRequestPermitted() {
-        return policy.isHttpRequestPermitted();
+    private boolean isHttpRequestPermitted(final String url) {
+        return policy.isHttpRequestPermitted(url);
     }
 
     public boolean httpHandler(final String method, final String requestedUrl,
                                final V8Function callback, final V8Function onerror,
                                final Integer timeout, final String data) {
         Log.d(TAG, "Enter httpHandler: "+ requestedUrl);
-        if (!isHttpRequestPermitted()) {
+        if (!isHttpRequestPermitted(requestedUrl)) {
             onerror.call(onerror, null);
             return false;
         }

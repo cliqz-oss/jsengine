@@ -10,18 +10,18 @@ import android.net.NetworkInfo;
 
 public abstract class HttpRequestPolicy {
 
-    abstract boolean isHttpRequestPermitted();
+    abstract boolean isHttpRequestPermitted(String url);
 
     public static HttpRequestPolicy ALWAYS_ALLOWED = new HttpRequestPolicy() {
         @Override
-        boolean isHttpRequestPermitted() {
+        boolean isHttpRequestPermitted(final String url) {
             return true;
         }
     };
 
     public static HttpRequestPolicy NEVER_ALLOWED = new HttpRequestPolicy() {
         @Override
-        boolean isHttpRequestPermitted() {
+        boolean isHttpRequestPermitted(final String url) {
             return false;
         }
     };
@@ -35,7 +35,7 @@ public abstract class HttpRequestPolicy {
         }
 
         @Override
-        boolean isHttpRequestPermitted() {
+        boolean isHttpRequestPermitted(final String url) {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             if (cm == null) {
                 // service wasn't available
