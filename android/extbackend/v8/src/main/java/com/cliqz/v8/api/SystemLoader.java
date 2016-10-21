@@ -10,17 +10,8 @@ import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
-import com.eclipsesource.v8.V8ScriptException;
-import com.eclipsesource.v8.V8Value;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -285,24 +276,7 @@ public class SystemLoader {
     }
 
     public String readSourceFile(final String assetPath) throws IOException {
-        InputStream stream = null;
-        try {
-            stream = context.getAssets().open(assetPath);
-            BufferedReader srcReader = new BufferedReader(new InputStreamReader(stream));
-            String script = "";
-            String line;
-            while ((line = srcReader.readLine()) != null) {
-                script += line + "\n";
-            }
-            return script;
-        }  finally {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (IOException e) {
-            }
-        }
+        return Utils.readFileFromContext(context, assetPath);
     }
 
     void loadJavascriptSource(final String assetPath) throws ExecutionException, IOException {
