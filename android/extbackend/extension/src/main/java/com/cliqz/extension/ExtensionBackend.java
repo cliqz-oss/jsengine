@@ -43,17 +43,22 @@ public class ExtensionBackend {
         jsApis.add(new HttpHandler(engine, HttpRequestPolicy.ALWAYS_ALLOWED));
         jsApis.add(new Crypto(engine));
         webRequest = new WebRequest(engine, this.context);
-        system = new SystemLoader(engine, this.context, BUILD_PATH);
+        system = new SystemLoader(engine, this.context, BUILD_PATH + "/modules");
     }
 
-    public void startup() {
+    public void startup() throws ExecutionException {
         try {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             engine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
             system.callFunctionOnModule("platform/startup", "default");
-        } catch(ExecutionException | IOException e) {
-
+        } catch(IOException e) {
+            throw new ExecutionException(e);
         }
     }
+
+    public void setPref(String prefName, Object value) throws ExecutionException {
+        system.callFunctionOnModuleDefault("core/utils", "setPref", prefName, value);
+    }
+
 }

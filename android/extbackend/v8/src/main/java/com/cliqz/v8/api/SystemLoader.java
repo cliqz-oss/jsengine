@@ -4,12 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.cliqz.v8.JSApiException;
+import com.cliqz.v8.QueryException;
 import com.cliqz.v8.V8Engine;
 import com.eclipsesource.v8.JavaCallback;
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
+import com.eclipsesource.v8.V8ResultUndefined;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -175,25 +177,31 @@ public class SystemLoader {
             return engine.queryEngine(new V8Engine.Query<V8Object>() {
                 @Override
                 public V8Object query(V8 runtime) {
-                    return loadModuleInternal(moduleName);
+                    try {
+                        return loadModuleInternal(moduleName);
+                    } catch (ExecutionException e) {
+                        throw new QueryException(e);
+                    }
                 }
             });
-        } catch (InterruptedException | TimeoutException e) {
+        } catch (QueryException | InterruptedException | TimeoutException e) {
             Log.e(TAG, "Error querying for module: "+ moduleName, e);
             throw new ExecutionException(e);
         }
     }
 
-    private V8Object loadModuleInternal(final String moduleName) {
+    private V8Object loadModuleInternal(final String moduleName) throws ExecutionException {
         V8Array moduleArgs = new V8Array(runtime).push(moduleName);
         V8Object system = runtime.getObject("System");
         try {
             PromiseCallback callback = new PromiseCallback(runtime);
             callback.attachToPromise(system.executeObjectFunction("import", moduleArgs)).release();
             return callback.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException e) {
             Log.e(TAG, "Error loading module: " + moduleName, e);
-            return null;
+            throw e;
+        } catch(InterruptedException e) {
+            throw new ExecutionException(e);
         } finally {
             moduleArgs.release();
             system.release();
@@ -214,6 +222,8 @@ public class SystemLoader {
                             throw new RuntimeException(modulePath + " has no function named "+ functionName);
                         }
                         return module.executeJSFunction(functionName, args);
+                    } catch (ExecutionException e) {
+                        throw new QueryException(e);
                     } finally {
                         if (module != null)
                             module.release();
@@ -243,13 +253,18 @@ public class SystemLoader {
                         final Object fnResult = moduleDefault.executeJSFunction(functionName, args);
                         if (fnResult instanceof V8Object) {
                             try {
-                                return jsonifyObject((V8Object) fnResult);
+                                if (((V8Object) fnResult).isUndefined())
+                                    return null;
+                                else
+                                    return jsonifyObject((V8Object) fnResult);
                             } finally {
                                 ((V8Object) fnResult).release();
                             }
                         } else {
                             return fnResult;
                         }
+                    } catch (ExecutionException e) {
+                        throw new QueryException(e);
                     } finally {
                         if (module != null)
                             module.release();
