@@ -19,6 +19,7 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sammacbeth on 29/09/2016.
@@ -31,9 +32,10 @@ public class HttpHandler {
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String TYPE_JSON = "application/json";
 
-    private final V8Engine engine;
+    final V8Engine engine;
     private final HttpRequestPolicy policy;
-    private final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
+    final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
+    private boolean shutdownRequested = false;
 
     public HttpHandler(final V8Engine engine, HttpRequestPolicy policy) throws JSApiException {
         this.engine = engine;
@@ -54,7 +56,13 @@ public class HttpHandler {
         this.engine.registerShutdownHook(new V8Engine.Query() {
             @Override
             public Object query(V8 runtime) {
+                shutdownRequested = true;
                 asyncExecutor.shutdown();
+                try {
+                    asyncExecutor.awaitTermination(10000, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 return null;
             }
         });
@@ -65,7 +73,7 @@ public class HttpHandler {
     }
 
     private boolean isHttpRequestPermitted(final String url) {
-        return policy.isHttpRequestPermitted(url);
+        return !shutdownRequested && policy.isHttpRequestPermitted(url);
     }
 
     public boolean httpHandler(final String method, final String requestedUrl,
@@ -86,26 +94,7 @@ public class HttpHandler {
             public void run() {
                 try {
                     final HttpResponse resp = makeHttpRequest(requestedUrl, method, timeout, data);
-                    engine.asyncQuery(new V8Engine.Query<Object>() {
-                        public Object query(V8 context) {
-                            V8Object responseObject = new V8Object(context);
-                            V8Array callbackArgs = new V8Array(context);
-                            try {
-                                responseObject.add("status", resp.code);
-                                responseObject.add("responseText", resp.code);
-                                responseObject.add("response", resp.code);
-                                successCallback.call(successCallback, callbackArgs.push(responseObject));
-                            } finally {
-                                successCallback.release();
-                                errorCallback.release();
-                                responseObject.release();
-                                callbackArgs.release();
-                            }
-                            return null;
-                        }
-                    });
-                } catch(InterruptedException | ExecutionException e) {
-                    Log.e(TAG, "Error making request callback", e);
+                    doHandlerCallback(resp, successCallback, errorCallback);
                 } catch(Exception e) {
                     // catch all exceptions to make sure an error callback is made
                     // otherwise promise chains will be broken and memory can be leaked
@@ -118,7 +107,7 @@ public class HttpHandler {
         return true;
     }
 
-    private class HttpResponse {
+    class HttpResponse {
         final String response;
         final int code;
 
@@ -127,8 +116,33 @@ public class HttpHandler {
             this.response = response;
         }
     }
+
+    void doHandlerCallback(final HttpResponse resp, final V8Function successCallback, final V8Function errorCallback) {
+        try {
+            engine.asyncQuery(new V8Engine.Query<Object>() {
+                public Object query(V8 context) {
+                    V8Object responseObject = new V8Object(context);
+                    V8Array callbackArgs = new V8Array(context);
+                    try {
+                        responseObject.add("status", resp.code);
+                        responseObject.add("responseText", resp.response);
+                        responseObject.add("response", resp.response);
+                        successCallback.call(successCallback, callbackArgs.push(responseObject));
+                    } finally {
+                        successCallback.release();
+                        errorCallback.release();
+                        responseObject.release();
+                        callbackArgs.release();
+                    }
+                    return null;
+                }
+            });
+        } catch(InterruptedException | ExecutionException e) {
+            Log.e(TAG, "Error making request callback", e);
+        }
+    }
     
-    private void doErrorCallback(final V8Function successCallback, final V8Function errorCallback) {
+    void doErrorCallback(final V8Function successCallback, final V8Function errorCallback) {
         try {
             engine.asyncQuery(new V8Engine.Query<Object>() {
                 public Object query(V8 context) {
