@@ -15,5 +15,6 @@ public class EngineTest {
         Engine extension = new Engine(appContext);
         extension.startup();
         extension.setPref("antiTrackTest", true);
+        extension.shutdown();
     }
 }

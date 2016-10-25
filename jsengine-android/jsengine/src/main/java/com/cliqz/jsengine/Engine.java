@@ -6,12 +6,14 @@ import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.JSConsole;
 import com.cliqz.jsengine.v8.Timers;
 import com.cliqz.jsengine.v8.V8Engine;
+import com.cliqz.jsengine.v8.api.ChromeUrlHandler;
 import com.cliqz.jsengine.v8.api.Crypto;
 import com.cliqz.jsengine.v8.api.FileIO;
 import com.cliqz.jsengine.v8.api.HttpHandler;
 import com.cliqz.jsengine.v8.api.HttpRequestPolicy;
 import com.cliqz.jsengine.v8.api.SystemLoader;
 import com.cliqz.jsengine.v8.api.WebRequest;
+import com.eclipsesource.v8.V8Object;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -24,7 +26,7 @@ public class Engine {
     private final Context context;
     private final Set<Object> jsApis = new HashSet<>();
     final SystemLoader system;
-    private final WebRequest webRequest;
+    public final WebRequest webRequest;
 
     private static final String BUILD_PATH = "build";
 
@@ -36,10 +38,10 @@ public class Engine {
         jsApis.add(new JSConsole(jsengine));
         jsApis.add(new Timers(jsengine));
         jsApis.add(new FileIO(jsengine, this.context));
-        jsApis.add(new HttpHandler(jsengine, HttpRequestPolicy.ALWAYS_ALLOWED));
         jsApis.add(new Crypto(jsengine));
         webRequest = new WebRequest(jsengine, this.context);
         system = new SystemLoader(jsengine, this.context, BUILD_PATH + "/modules");
+        jsApis.add(new ChromeUrlHandler(jsengine, HttpRequestPolicy.ALWAYS_ALLOWED, system));
     }
 
     public void startup() throws ExecutionException {
@@ -47,10 +49,14 @@ public class Engine {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
-            system.callFunctionOnModule("platform/startup", "default");
+            system.callVoidFunctionOnModule("platform/startup", "default");
         } catch(IOException e) {
             throw new ExecutionException(e);
         }
+    }
+
+    public void shutdown() {
+        jsengine.shutdown();
     }
 
     public void setPref(String prefName, Object value) throws ExecutionException {
@@ -60,5 +66,7 @@ public class Engine {
     public Object getPref(String prefName) throws ExecutionException {
         return system.callFunctionOnModuleDefault("core/utils", "getPref");
     }
+
+
 
 }

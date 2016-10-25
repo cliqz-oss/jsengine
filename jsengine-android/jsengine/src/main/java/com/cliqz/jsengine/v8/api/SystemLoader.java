@@ -234,6 +234,23 @@ public class SystemLoader {
         }
     }
 
+    public void callVoidFunctionOnModule(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
+        try {
+            final Object result = callFunctionOnModule(modulePath, functionName, args);
+            if (result instanceof V8Object) {
+                engine.asyncQuery(new V8Engine.Query<Object>() {
+                    @Override
+                    public Object query(V8 runtime) {
+                        ((V8Object) result).release();
+                        return null;
+                    }
+                });
+            }
+        } catch (InterruptedException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
     public Object callFunctionOnModuleDefault(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
         try {
             return engine.queryEngine(new V8Engine.Query<Object>() {
