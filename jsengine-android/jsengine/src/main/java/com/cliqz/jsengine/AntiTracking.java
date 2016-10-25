@@ -13,10 +13,25 @@ import java.util.concurrent.ExecutionException;
 
 public class AntiTracking {
 
+    private final static String ENABLE_PREF = "antiTrackTest";
+    private final static String QSBLOCKING_PREF = "attrackRemoveQueryStringTracking";
+    private final static String BLOOM_FILTER_PREF = "attrackBloomFilter";
+    private final static String FORCE_BLOCK_PREF = "attrackForceBlock";
+
     private final Engine engine;
 
     public AntiTracking(Engine engine) {
         this.engine = engine;
+    }
+
+    public void setEnabled(final boolean enabled) throws ExecutionException {
+        engine.setPref(BLOOM_FILTER_PREF, true);
+        engine.setPref(ENABLE_PREF, enabled);
+        engine.setPref(QSBLOCKING_PREF, true);
+    }
+
+    public void setForceBlockEnabled(final boolean enabled) throws ExecutionException {
+        engine.setPref(FORCE_BLOCK_PREF, enabled);
     }
 
     public JSONObject getTabBlockingInfo(final int tabId) {
