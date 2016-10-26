@@ -31,7 +31,7 @@ public class ChromeUrlHandler extends HttpHandler {
             this.engine.asyncQuery(new V8Engine.Query<Object>() {
                 @Override
                 public Object query(V8 runtime) {
-                    runtime.registerJavaMethod(ChromeUrlHandler.this, "chromeUrlHandler", "chromeUrlHandler", new Class<?>[]{String.class, V8Function.class, V8Function.class});
+                    runtime.registerJavaMethod(ChromeUrlHandler.this, "chromeHandler", "chromeUrlHandler", new Class<?>[]{String.class, V8Function.class, V8Function.class});
                     return null;
                 }
             });
@@ -42,7 +42,7 @@ public class ChromeUrlHandler extends HttpHandler {
 
     public boolean chromeHandler(final String requestedUrl,
                                final V8Function callback, final V8Function onerror) {
-        if (!(requestedUrl.startsWith("file://") || requestedUrl.startsWith("chrome://"))) {
+        if (!requestedUrl.startsWith("file://") && !requestedUrl.startsWith("chrome://")) {
             onerror.call(onerror, null);
             return false;
         }
@@ -55,7 +55,7 @@ public class ChromeUrlHandler extends HttpHandler {
             @Override
             public void run() {
                 try {
-                    final String assetPath = requestedUrl.replace("file://", "").replace("chrome://cliqz/content", system.moduleRoot + "/modules");
+                    final String assetPath = requestedUrl.replace("file://", "").replace("chrome://cliqz/content", system.moduleRoot);
                     final String fileContents = system.readSourceFile(assetPath);
                     final HttpResponse resp = new HttpResponse(200, fileContents);
                     doHandlerCallback(resp, successCallback, errorCallback);

@@ -22,8 +22,8 @@ public class JSConsole {
                 public Object query(V8 runtime) {
                     v8Console = new V8Object(runtime);
                     runtime.add("console", v8Console);
-                    v8Console.registerJavaMethod(JSConsole.this, "log", "log", new Class<?>[] { String.class });
-                    v8Console.registerJavaMethod(JSConsole.this, "err", "err", new Class<?>[] { String.class });
+                    v8Console.registerJavaMethod(JSConsole.this, "log", "log", new Class<?>[] { Object.class });
+                    v8Console.registerJavaMethod(JSConsole.this, "err", "err", new Class<?>[] { Object.class });
                     return null;
                 }
             });
@@ -39,11 +39,11 @@ public class JSConsole {
         });
     }
 
-    public void log(final String message) {
-        Log.d(TAG, message);
+    public void log(final Object message) {
+        Log.d(TAG, message.toString());
     }
 
-    public void err(final String message) {
-        Log.e(TAG, message);
+    public void err(final Object message) {
+        Log.e(TAG, message.toString());
     }
 }
