@@ -28,7 +28,7 @@ public class Crypto {
                 public Object query(V8 runtime) {
                     v8Crypto = new V8Object(runtime);
                     runtime.add("crypto", v8Crypto);
-                    v8Crypto.registerJavaMethod(Crypto.this, "md5", "md5", new Class<?>[] { String.class });
+                    v8Crypto.registerJavaMethod(Crypto.this, "md5", "md5", new Class<?>[] { Object.class });
                     return null;
                 }
             });
@@ -44,10 +44,10 @@ public class Crypto {
         });
     }
 
-    public String md5(final String input) {
+    public String md5(final Object input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes());
+            byte[] messageDigest = md.digest(input.toString().getBytes());
             StringBuffer hexString = new StringBuffer();
 
             for (byte bMd5 : messageDigest) {

@@ -188,7 +188,7 @@ public class WebRequest {
                     } catch(V8ResultUndefined e) {
                         return "{}";
                     } catch(V8ScriptExecutionException e) {
-                        Log.e("CliqzAntiTracking", "error in webrequests", e);
+                        Log.e(TAG, "error in webrequests", e);
                         return "{}";
                     } finally {
                         // release handles for V8 objects we created
