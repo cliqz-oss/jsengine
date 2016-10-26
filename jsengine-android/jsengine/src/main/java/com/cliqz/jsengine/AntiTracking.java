@@ -2,6 +2,8 @@ package com.cliqz.jsengine;
 
 import android.util.Log;
 
+import com.cliqz.jsengine.v8.api.WebRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,9 +21,11 @@ public class AntiTracking {
     private final static String FORCE_BLOCK_PREF = "attrackForceBlock";
 
     private final Engine engine;
+    private final WebRequest webRequest;
 
     public AntiTracking(Engine engine) {
         this.engine = engine;
+        this.webRequest = engine.webRequest;
     }
 
     public void setEnabled(final boolean enabled) throws ExecutionException {
@@ -36,7 +40,7 @@ public class AntiTracking {
 
     public JSONObject getTabBlockingInfo(final int tabId) {
         try {
-            final Object blockingInfo = engine.system.callFunctionOnModuleDefault("antitracking/attrack", "getTabBlockingInfo", tabId);
+            final Object blockingInfo = engine.system.callFunctionOnModuleDefault("antitracking/attrack", "getTabBlockingInfo", tabId, webRequest.getUrlForTab(tabId));
             return new JSONObject(blockingInfo.toString());
         } catch (ExecutionException e) {
             Log.e("attrack", "getTabBlockingInfo error", e);

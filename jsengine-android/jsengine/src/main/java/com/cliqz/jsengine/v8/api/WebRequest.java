@@ -10,6 +10,7 @@ import android.webkit.WebView;
 
 import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.V8Engine;
+import com.eclipsesource.v8.JavaCallback;
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
@@ -74,6 +75,19 @@ public class WebRequest {
                     return runtime.getObject("webRequest");
                 }
             });
+            this.engine.asyncQuery(new V8Engine.Query<Object>() {
+                @Override
+                public Object query(V8 runtime) {
+                    runtime.registerJavaMethod(new JavaCallback() {
+                        @Override
+                        public Object invoke(V8Object v8Object, V8Array v8Array) {
+                            int windowId = Integer.parseInt(v8Array.get(0).toString());
+                            return isTabActive(windowId);
+                        }
+                    }, "_nativeIsWindowActive");
+                    return null;
+                }
+            });
         } catch (IOException | ExecutionException | TimeoutException | InterruptedException e) {
             throw new JSApiException(e);
         }
@@ -85,6 +99,19 @@ public class WebRequest {
                 return null;
             }
         });
+    }
+
+    public boolean isTabActive(final int tabId) {
+        Pair<Uri, WeakReference<WebView>> tuple = tabs.get(tabId);
+        return tuple != null && tuple.second.get() != null;
+    }
+
+    public String getUrlForTab(final int tabId) {
+        if (isTabActive(tabId)) {
+            return tabs.get(tabId).first.toString();
+        } else {
+            return null;
+        }
     }
 
     public WebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
