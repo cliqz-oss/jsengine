@@ -43,7 +43,9 @@ public class FileIO {
                     return null;
                 }
             });
-        } catch (InterruptedException | ExecutionException e) {
+            // load fs polyfill
+            engine.executeScript(Utils.readFileFromContext(context, "fs-polyfill.js"));
+        } catch (InterruptedException | ExecutionException | IOException e) {
             throw new JSApiException(e);
         }
         engine.registerShutdownHook(new V8Engine.Query() {
