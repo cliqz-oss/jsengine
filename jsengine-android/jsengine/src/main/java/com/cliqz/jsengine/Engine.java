@@ -18,6 +18,7 @@ import com.eclipsesource.v8.V8Object;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -47,12 +48,12 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, HttpRequestPolicy.ALWAYS_ALLOWED, system));
     }
 
-    public void startup(JSONObject defaultPrefs) throws ExecutionException {
+    public void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
         try {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
-            jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + defaultPrefs.toString() + ");");
+            jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
             system.callVoidFunctionOnModule("platform/startup", "default");
 //            jsengine.executeScript("System.import('platform/startup').then(function(mod) { mod.default() }).catch(function(err) { console.log(err) } );");
         } catch(IOException e) {
@@ -61,7 +62,7 @@ public class Engine {
     }
 
     public void startup() throws ExecutionException {
-        startup(new JSONObject());
+        startup(new HashMap<String, Object>());
     }
 
     public void shutdown() {

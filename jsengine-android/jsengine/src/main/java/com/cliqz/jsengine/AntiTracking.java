@@ -7,6 +7,8 @@ import com.cliqz.jsengine.v8.api.WebRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -29,19 +31,19 @@ public class AntiTracking {
         this.webRequest = engine.webRequest;
     }
 
-    public JSONObject getDefaultPrefs() {
-        final JSONObject prefs = new JSONObject();
-        try {
-            prefs.put(BLOOM_FILTER_PREF, true);
-            prefs.put(ENABLE_PREF, true);
-            prefs.put(QSBLOCKING_PREF, true);
-        } catch (JSONException e) {
-        }
+    public Map<String, Object> getDefaultPrefs() {
+        final Map<String, Object> prefs = new HashMap<>();
+        prefs.put(BLOOM_FILTER_PREF, true);
+        prefs.put(ENABLE_PREF, true);
+        prefs.put(QSBLOCKING_PREF, true);
         return prefs;
     }
 
     public void setEnabled(final boolean enabled) throws ExecutionException {
-        engine.setPref("modules."+ MODULE_NAME + ".enabled", true);
+        engine.setPref(BLOOM_FILTER_PREF, true);
+        engine.setPref(QSBLOCKING_PREF, true);
+        engine.setPref(ENABLE_PREF, true);
+        engine.setPref("modules."+ MODULE_NAME + ".enabled", enabled);
     }
 
     public void setForceBlockEnabled(final boolean enabled) throws ExecutionException {
