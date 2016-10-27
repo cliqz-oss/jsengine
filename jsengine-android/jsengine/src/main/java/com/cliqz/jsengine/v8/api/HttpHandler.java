@@ -80,14 +80,15 @@ public class HttpHandler {
                                final V8Function callback, final V8Function onerror,
                                final Integer timeout, final String data) {
         Log.d(TAG, "Enter httpHandler: "+ requestedUrl);
-        if (!isHttpRequestPermitted(requestedUrl)) {
-            onerror.call(onerror, null);
-            return false;
-        }
 
         // keep a handle on the callbacks
         final V8Function successCallback = (V8Function) callback.twin();
         final V8Function errorCallback = (V8Function) onerror.twin();
+
+        if (!isHttpRequestPermitted(requestedUrl)) {
+            doErrorCallback(successCallback, errorCallback);
+            return false;
+        }
 
         asyncExecutor.submit(new Runnable() {
             @Override
