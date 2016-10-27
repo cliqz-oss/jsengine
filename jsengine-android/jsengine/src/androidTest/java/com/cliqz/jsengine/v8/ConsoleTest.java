@@ -18,7 +18,22 @@ public class ConsoleTest {
         engine.queryEngine(new V8Engine.Query<Object>() {
             public Object query(V8 runtime) {
                 runtime.executeVoidScript("console.log('test');");
-                runtime.executeVoidScript("console.err('error test');");
+                runtime.executeVoidScript("console.error('error test');");
+                return null;
+            }
+        });
+        engine.shutdown();
+    }
+
+    @Test
+    public void multiArgConsoleTest() throws Exception {
+        V8Engine engine = new V8Engine();
+        new JSConsole(engine);
+        // test that console log and err functions do not raise errors
+        engine.queryEngine(new V8Engine.Query<Object>() {
+            public Object query(V8 runtime) {
+                runtime.executeVoidScript("console.log('test', 'multi', 'arg');");
+                runtime.executeVoidScript("console.error('error test', 'multi', 'arg');");
                 return null;
             }
         });

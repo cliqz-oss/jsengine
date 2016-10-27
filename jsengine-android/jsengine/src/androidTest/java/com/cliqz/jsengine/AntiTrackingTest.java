@@ -22,8 +22,8 @@ public class AntiTrackingTest {
     public void testBasicApi() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
         Engine extension = new Engine(appContext);
-        extension.startup();
         AntiTracking attrack = new AntiTracking(extension);
+        extension.startup(attrack.getDefaultPrefs());
         attrack.setEnabled(true);
         final JSONObject tabInfo = attrack.getTabBlockingInfo(1);
         assertTrue(tabInfo.has("error"));

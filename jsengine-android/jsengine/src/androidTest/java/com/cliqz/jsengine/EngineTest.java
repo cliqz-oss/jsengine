@@ -14,7 +14,6 @@ public class EngineTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
         Engine extension = new Engine(appContext);
         extension.startup();
-        extension.setPref("antiTrackTest", true);
         extension.shutdown();
     }
 }
