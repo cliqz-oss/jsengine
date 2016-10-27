@@ -15,8 +15,11 @@ import com.cliqz.jsengine.v8.api.SystemLoader;
 import com.cliqz.jsengine.v8.api.WebRequest;
 import com.eclipsesource.v8.V8Object;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -44,15 +47,21 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, HttpRequestPolicy.ALWAYS_ALLOWED, system));
     }
 
-    public void startup() throws ExecutionException {
+    public void startup(JSONObject defaultPrefs) throws ExecutionException {
         try {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
+            jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + defaultPrefs.toString() + ");");
             system.callVoidFunctionOnModule("platform/startup", "default");
+//            jsengine.executeScript("System.import('platform/startup').then(function(mod) { mod.default() }).catch(function(err) { console.log(err) } );");
         } catch(IOException e) {
             throw new ExecutionException(e);
         }
+    }
+
+    public void startup() throws ExecutionException {
+        startup(new JSONObject());
     }
 
     public void shutdown() {
@@ -66,7 +75,6 @@ public class Engine {
     public Object getPref(String prefName) throws ExecutionException {
         return system.callFunctionOnModuleDefault("core/utils", "getPref");
     }
-
 
 
 }
