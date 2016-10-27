@@ -47,6 +47,10 @@ public class SystemLoader {
             engine.executeScript("var exports = {}");
             loadJavascriptSource("system-polyfill.js");
             engine.executeScript("var System = exports.System;");
+            // some custom modules for the App: system and promise
+            engine.executeScript("System.set('system', { default: System });");
+            engine.executeScript("System.set('promise', { default: Promise });");
+
             engine.asyncQuery(new V8Engine.Query<Object>() {
                 @Override
                 public Object query(V8 runtime) {
@@ -74,9 +78,9 @@ public class SystemLoader {
 
     public boolean loadSubScript(final String scriptPath) throws IOException {
         Log.d(TAG, "loadSubScript: "+ scriptPath);
-            String script = readSourceFile(this.moduleRoot + scriptPath);
-            runtime.executeVoidScript(script);
-            return true;
+        String script = readSourceFile(this.moduleRoot + scriptPath);
+        runtime.executeVoidScript(script);
+        return true;
     }
 
     class PromiseCallback implements Future<V8Object> {
