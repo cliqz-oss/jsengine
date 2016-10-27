@@ -2,7 +2,9 @@ package com.cliqz.jsengine.v8;
 
 import android.util.Log;
 
+import com.eclipsesource.v8.JavaVoidCallback;
 import com.eclipsesource.v8.V8;
+import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 
 import java.util.concurrent.ExecutionException;
@@ -22,8 +24,20 @@ public class JSConsole {
                 public Object query(V8 runtime) {
                     v8Console = new V8Object(runtime);
                     runtime.add("console", v8Console);
-                    v8Console.registerJavaMethod(JSConsole.this, "log", "log", new Class<?>[] { Object.class });
-                    v8Console.registerJavaMethod(JSConsole.this, "err", "err", new Class<?>[] { Object.class });
+                    v8Console.registerJavaMethod(new JavaVoidCallback() {
+                        @Override
+                        public void invoke(V8Object v8Object, V8Array v8Array) {
+                            //final StringBuilder parts = new StringBuilder();
+                            log(v8Array.toString());
+                        }
+                    }, "log");
+                    v8Console.registerJavaMethod(new JavaVoidCallback() {
+                        @Override
+                        public void invoke(V8Object v8Object, V8Array v8Array) {
+                            //final StringBuilder parts = new StringBuilder();
+                            error(v8Array.toString());
+                        }
+                    }, "error");
                     return null;
                 }
             });
@@ -39,11 +53,11 @@ public class JSConsole {
         });
     }
 
-    public void log(final Object message) {
-        Log.d(TAG, message.toString());
+    public void log(final String message) {
+        Log.d(TAG, message);
     }
 
-    public void err(final Object message) {
-        Log.e(TAG, message.toString());
+    public void error(final String message) {
+        Log.e(TAG, message);
     }
 }
