@@ -11,6 +11,7 @@ import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
+import com.eclipsesource.v8.V8ResultUndefined;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -97,8 +98,10 @@ public class SystemLoader {
             return new V8Function(runtime, new JavaCallback() {
                 @Override
                 public Object invoke(V8Object v8Object, V8Array v8Array) {
-                    PromiseCallback.this.thenResult = v8Array.getObject(0);
-                    notifyAll();
+                   synchronized (PromiseCallback.this) {
+                        PromiseCallback.this.thenResult = v8Array.getObject(0);
+                        PromiseCallback.this.notifyAll();
+                    }
                     return null;
                 }
             });
@@ -108,30 +111,33 @@ public class SystemLoader {
             return new V8Function(runtime, new JavaCallback() {
                 @Override
                 public Object invoke(V8Object v8Object, V8Array v8Array) {
-                    PromiseCallback.this.catchResult = v8Array.getObject(0);
-                    notifyAll();
+                    synchronized (PromiseCallback.this) {
+                        PromiseCallback.this.catchResult = v8Array.getObject(0);
+                        PromiseCallback.this.notifyAll();
+                    }
                     return null;
                 }
             });
         }
 
-        V8Object attachToPromise(V8Object promise) {
+        void attachToPromise(V8Object promise) {
             final V8Function thenCb = thenCallback();
             final V8Function catchCb = catchCallback();
             final V8Array thenArgs = new V8Array(runtime).push(thenCb);
             final V8Array catchArgs = new V8Array(runtime).push(catchCb);
-            V8Object intermediatePromise = null;
+//            V8Object intermediatePromise = null;
             try {
-                intermediatePromise = promise.executeObjectFunction("then", thenArgs);
-                return intermediatePromise.executeObjectFunction("catch", catchArgs);
+                promise.executeVoidFunction("then", thenArgs);
+                promise.executeVoidFunction("catch", catchArgs);
+//                return intermediatePromise.executeObjectFunction("catch", catchArgs);
             } finally {
                 thenArgs.release();
                 catchArgs.release();
                 thenCb.release();
                 catchCb.release();
-                if (intermediatePromise != null) {
-                    intermediatePromise.release();
-                }
+//                if (intermediatePromise != null) {
+//                    intermediatePromise.release();
+//                }
                 promise.release();
             }
         }
@@ -148,7 +154,9 @@ public class SystemLoader {
 
         @Override
         public boolean isDone() {
-            return thenResult != null || catchResult != null;
+            synchronized (this) {
+                return thenResult != null || catchResult != null;
+            }
         }
 
         @Override
@@ -167,6 +175,7 @@ public class SystemLoader {
 
         private V8Object getResult() throws ExecutionException {
             if (catchResult != null) {
+                Log.e(TAG, catchResult.getObject("stack").toString());
                 throw new ExecutionException("Promise.catch: " + catchResult.toString(), new RuntimeException());
             }
             if (thenResult != null) {
@@ -221,9 +230,12 @@ public class SystemLoader {
         V8Object system = runtime.getObject("System");
         try {
             PromiseCallback callback = new PromiseCallback(runtime);
-            callback.attachToPromise(system.executeObjectFunction("import", moduleArgs)).release();
+            V8Object importPromise = system.executeObjectFunction("import", moduleArgs);
+            callback.attachToPromise(importPromise);
+
             final V8Object module = callback.get();
             moduleCache.put(moduleName, module);
+            Log.d(TAG, "Loaded module "+ moduleName +" with "+ module.getKeys().length + " properties");
             return module;
         } catch (ExecutionException e) {
             Log.e(TAG, "Error loading module: " + moduleName, e);
@@ -267,7 +279,11 @@ public class SystemLoader {
                 });
             }
         } catch (InterruptedException e) {
+            if (e.getCause() instanceof V8ResultUndefined) {
+                return;
+            }
             throw new ExecutionException(e);
+        } catch (V8ResultUndefined e) {
         }
     }
 
