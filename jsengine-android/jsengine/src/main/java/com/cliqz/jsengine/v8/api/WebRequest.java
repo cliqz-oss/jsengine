@@ -132,59 +132,58 @@ public class WebRequest {
             }
         }
 
+        final String headersAccept = request.getRequestHeaders().get("Accept");
+        final int contentPolicyType;
+        if (isMainDocument) {
+            contentPolicyType = NUM_DOCUMENT;
+        } else if (headersAccept != null) {
+            if (headersAccept.contains("text/css")) {
+                contentPolicyType = NUM_STYLESHEET;
+            } else if (headersAccept.contains("image/*") || headersAccept.contains("image/webp")) {
+                contentPolicyType = NUM_IMAGE;
+            } else if (headersAccept.contains("text/html")) {
+                contentPolicyType = NUM_SUBDOCUMENT;
+            } else {
+                contentPolicyType = guessContentPolicyTypeFromUrl(requestUrl.toString());
+            }
+        } else {
+            contentPolicyType = guessContentPolicyTypeFromUrl(requestUrl.toString());
+        }
+
         String block = "{}";
         try {
             block = engine.queryEngine(new V8Engine.Query<String>() {
                 @Override
                 public String query(V8 runtime) {
-                    V8Object blockingResponse = null;
                     // build request metadata object
-                    V8Object requestInfo = new V8Object(runtime);
-                    requestInfo.add("url", requestUrl.toString());
-                    requestInfo.add("method", request.getMethod());
-                    requestInfo.add("tabId", view.hashCode());
-                    requestInfo.add("parentFrameId", -1);
-                    requestInfo.add("frameId", view.hashCode());
-                    requestInfo.add("isPrivate", false);
-                    requestInfo.add("originUrl", isMainDocument ? requestUrl.toString() : tabs.get(view.hashCode()).first.toString());
+                    final JSONObject requestInfo = new JSONObject();
+                    try {
+                        requestInfo.put("url", requestUrl.toString());
+                        requestInfo.put("method", request.getMethod());
+                        requestInfo.put("tabId", view.hashCode());
+                        requestInfo.put("parentFrameId", -1);
+                        requestInfo.put("frameId", view.hashCode());
+                        requestInfo.put("isPrivate", false);
+                        requestInfo.put("originUrl", isMainDocument ? requestUrl.toString() : tabs.get(view.hashCode()).first.toString());
+                        requestInfo.put("source", requestInfo.getString("originUrl"));
+                        requestInfo.put("type", contentPolicyType);
 
-                    final String headersAccept = request.getRequestHeaders().get("Accept");
-
-                    final int contentPolicyType;
-                    if (isMainDocument) {
-                        contentPolicyType = NUM_DOCUMENT;
-                    } else if (headersAccept != null) {
-                        if (headersAccept.contains("text/css")) {
-                            contentPolicyType = NUM_STYLESHEET;
-                        } else if (headersAccept.contains("image/*") || headersAccept.contains("image/webp")) {
-                            contentPolicyType = NUM_IMAGE;
-                        } else if (headersAccept.contains("text/html")) {
-                            contentPolicyType = NUM_SUBDOCUMENT;
-                        } else {
-                            contentPolicyType = guessContentPolicyTypeFromUrl(requestUrl.toString());
+                        JSONObject requestHeaders = new JSONObject();
+                        for (Map.Entry<String, String> e : request.getRequestHeaders().entrySet()) {
+                            requestHeaders.put(e.getKey(), e.getValue());
                         }
-                    } else {
-                        contentPolicyType = guessContentPolicyTypeFromUrl(requestUrl.toString());
-                    }
+                        requestInfo.put("requestHeaders", requestHeaders);
+                    } catch(JSONException e) {
 
-                    requestInfo.add("type", contentPolicyType);
-
-                    V8Object requestHeaders = new V8Object(runtime);
-                    for(Map.Entry<String, String> e : request.getRequestHeaders().entrySet()) {
-                        requestHeaders.add(e.getKey(), e.getValue());
                     }
-                    requestInfo.add("requestHeaders", requestHeaders);
 
                     V8Array webRequestArgs = new V8Array(runtime);
-                    V8Array stringifyArgs = new V8Array(runtime);
                     V8Object webRequestEntry = webRequest.getObject("onBeforeRequest");
-                    V8Object json = runtime.getObject("JSON");
 
                     try {
                         // query engine for action
-                        blockingResponse = webRequestEntry.executeObjectFunction("_trigger", webRequestArgs.push(requestInfo));
+                        return webRequestEntry.executeStringFunction("_triggerJson", webRequestArgs.push(requestInfo.toString()));
                         // stringify response object
-                        return json.executeStringFunction("stringify", stringifyArgs.push(blockingResponse));
                     } catch(V8ResultUndefined e) {
                         return "{}";
                     } catch(V8ScriptExecutionException e) {
@@ -192,13 +191,8 @@ public class WebRequest {
                         return "{}";
                     } finally {
                         // release handles for V8 objects we created
-                        if (blockingResponse != null)
-                            blockingResponse.release();
-                        requestInfo.release();
                         webRequestArgs.release();
-                        stringifyArgs.release();
                         webRequestEntry.release();
-                        json.release();
                     }
                 }
             }, QUERY_TIMEOUT);

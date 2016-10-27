@@ -47,14 +47,18 @@ public class Timers {
                             "  setTimeout = function (vCallback, nDelay /*, argumentToPass1, argumentToPass2, etc. */) {\n" +
                             "    var aArgs = Array.prototype.slice.call(arguments, 2);\n" +
                             "    return __nativeST__(vCallback instanceof Function ? function () {\n" +
+                            "      try {\n" +
                             "      vCallback.apply(null, aArgs);\n" +
+                            "       } catch (e) { console.error('Timer error', e, vCallback.name); }\n" +
                             "    } : vCallback, nDelay);\n" +
                             "  };\n" +
                             "  var __nativeSI__ = setInterval;\n" +
                             "  setInterval = function (vCallback, nDelay /*, argumentToPass1, argumentToPass2, etc. */) {\n" +
                             "    var aArgs = Array.prototype.slice.call(arguments, 2);\n" +
                             "    return __nativeSI__(vCallback instanceof Function ? function () {\n" +
+                            "      try {\n" +
                             "      vCallback.apply(null, aArgs);\n" +
+                            "       } catch (e) { console.error('Timer error', e, vCallback.name); }\n" +
                             "    } : vCallback, nDelay);\n" +
                             "  };\n");
                     return null;

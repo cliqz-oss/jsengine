@@ -7,6 +7,17 @@ var webRequest = {
         },
         removeListener(listener) {},
 
+        _triggerJson(requestInfoJson) {
+          const requestInfo = JSON.parse(requestInfoJson);
+          try {
+              const response = webRequest.onBeforeRequest._trigger(requestInfo) || {};
+              console.log(JSON.stringify(response));
+              return JSON.stringify(response);
+          } catch(e) {
+            console.error(e);
+          }
+        },
+
         _trigger(requestInfo) {
           // getter for request headers
           requestInfo.getRequestHeader = function(header) {
@@ -15,7 +26,7 @@ var webRequest = {
           for (let listener of this.listeners) {
             const {fn, filter, extraInfo} = listener;
               const blockingResponse = fn(requestInfo);
-
+              console.log(JSON.stringify(blockingResponse));
               if (blockingResponse && Object.keys(blockingResponse).length > 0) {
                 return blockingResponse;
               }
