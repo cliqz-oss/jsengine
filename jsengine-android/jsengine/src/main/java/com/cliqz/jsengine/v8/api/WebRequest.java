@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -114,7 +115,7 @@ public class WebRequest {
         }
     }
 
-    public WebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
+    public AnnotatedWebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
         final boolean isMainDocument = request.isForMainFrame();
         final Uri requestUrl = request.getUrl();
 
@@ -205,9 +206,10 @@ public class WebRequest {
 
         try {
             JSONObject blockResponse = new JSONObject(block);
+            final String source = blockResponse.optString("source", "");
             if (blockResponse.has("cancel") && blockResponse.getBoolean("cancel")) {
                 Log.d(TAG, "Block request: " + requestUrl.toString());
-                return blockRequest();
+                return blockRequest(source);
             } else if(blockResponse.has("redirectUrl") || blockResponse.has("requestHeaders")) {
                 String newUrl;
                 if (blockResponse.has("redirectUrl")) {
@@ -225,7 +227,7 @@ public class WebRequest {
                 }
                 Log.d(TAG, "Modify request from: " + requestUrl.toString());
                 //Log.d(TAG, "                 to: " + newUrl);
-                return modifyRequest(request, newUrl, modifiedHeaders);
+                return modifyRequest(source, request, newUrl, modifiedHeaders);
             }
         } catch(JSONException e) {
             Log.e(TAG, "Bad data from JS: " + block, e);
@@ -252,7 +254,7 @@ public class WebRequest {
         }
     }
 
-    private WebResourceResponse modifyRequest(WebResourceRequest request, String newUrlString, Map<String, String> modifyHeaders) {
+    private AnnotatedWebResourceResponse modifyRequest(final String decisionSource, WebResourceRequest request, String newUrlString, Map<String, String> modifyHeaders) {
         HttpURLConnection connection;
         try {
             URL newUrl = new URL(newUrlString);
@@ -270,7 +272,7 @@ public class WebRequest {
 
             Log.d(TAG, "Redirect to: "+ newUrlString);
             connection.connect();
-            final WebResourceResponse response = new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
+            final AnnotatedWebResourceResponse response = new AnnotatedWebResourceResponse(decisionSource, connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
             response.setStatusCodeAndReasonPhrase(connection.getResponseCode(), connection.getResponseMessage());
             // parse response headers
             final Map<String, String> responseHeaders = new HashMap<>();
@@ -283,14 +285,25 @@ public class WebRequest {
             return response;
         } catch (MalformedURLException e) {
             Log.e(TAG, "Bad redirect url: " + e.getMessage());
-            return blockRequest();
+            return blockRequest(decisionSource);
         } catch (IllegalArgumentException | IOException e) {
             Log.e(TAG, "Could not redirect: " + e.getMessage());
-            return blockRequest();
+            return blockRequest(decisionSource);
         }
     }
 
-    private WebResourceResponse blockRequest() {
-        return new WebResourceResponse("text/html", "UTF-8", new ByteArrayInputStream("".getBytes()));
+    private AnnotatedWebResourceResponse blockRequest(final String decisionSource) {
+        return new AnnotatedWebResourceResponse(decisionSource, "text/html", "UTF-8", new ByteArrayInputStream("".getBytes()));
+    }
+
+    public class AnnotatedWebResourceResponse extends WebResourceResponse {
+
+        public final String source;
+
+        AnnotatedWebResourceResponse(String source, String mimeType, String encoding, InputStream data) {
+            super(mimeType, encoding, data);
+            this.source = source;
+        }
+
     }
 }
