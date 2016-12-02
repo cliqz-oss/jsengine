@@ -5,7 +5,14 @@ var webRequest = {
         addListener(listener, filter, extraInfo) {
           this.listeners.push({fn: listener, filter, extraInfo});
         },
-        removeListener(listener) {},
+        removeListener(listener) {
+          const ind = this.listeners.findIndex((l) => {
+            return l.fn === listener;
+          });
+          if (ind > -1) {
+            this.listeners.splice(ind, 1);
+          }
+        },
 
         _triggerJson(requestInfoJson) {
           const requestInfo = JSON.parse(requestInfoJson);
@@ -14,7 +21,7 @@ var webRequest = {
               console.log(JSON.stringify(response));
               return JSON.stringify(response);
           } catch(e) {
-            console.error(e);
+            console.error('webrequest trigger error', e);
           }
         },
 
@@ -24,7 +31,7 @@ var webRequest = {
             return requestInfo.requestHeaders[header];
           };
           for (let listener of this.listeners) {
-            const {fn, filter, extraInfo} = listener;
+              const {fn, filter, extraInfo} = listener;
               const blockingResponse = fn(requestInfo);
               console.log(JSON.stringify(blockingResponse));
               if (blockingResponse && Object.keys(blockingResponse).length > 0) {
