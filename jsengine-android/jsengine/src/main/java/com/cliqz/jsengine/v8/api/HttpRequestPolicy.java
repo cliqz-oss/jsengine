@@ -26,7 +26,7 @@ public abstract class HttpRequestPolicy {
         }
     };
 
-    public class AllowOnWifi extends HttpRequestPolicy {
+    public static class AllowOnWifi extends HttpRequestPolicy {
 
         final Context context;
 

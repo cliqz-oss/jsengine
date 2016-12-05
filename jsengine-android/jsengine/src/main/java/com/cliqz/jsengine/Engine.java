@@ -9,11 +9,9 @@ import com.cliqz.jsengine.v8.V8Engine;
 import com.cliqz.jsengine.v8.api.ChromeUrlHandler;
 import com.cliqz.jsengine.v8.api.Crypto;
 import com.cliqz.jsengine.v8.api.FileIO;
-import com.cliqz.jsengine.v8.api.HttpHandler;
 import com.cliqz.jsengine.v8.api.HttpRequestPolicy;
 import com.cliqz.jsengine.v8.api.SystemLoader;
 import com.cliqz.jsengine.v8.api.WebRequest;
-import com.eclipsesource.v8.V8Object;
 
 import org.json.JSONObject;
 
@@ -34,7 +32,7 @@ public class Engine {
 
     private static final String BUILD_PATH = "build";
 
-    public Engine(final Context context) throws JSApiException {
+    public Engine(final Context context, final boolean mobileDataEnabled) throws JSApiException {
         this.context = context.getApplicationContext();
         jsengine = new V8Engine();
         // load js APIs
@@ -45,7 +43,8 @@ public class Engine {
         jsApis.add(new Crypto(jsengine));
         webRequest = new WebRequest(jsengine, this.context);
         system = new SystemLoader(jsengine, this.context, BUILD_PATH + "/modules");
-        jsApis.add(new ChromeUrlHandler(jsengine, HttpRequestPolicy.ALWAYS_ALLOWED, system));
+        final HttpRequestPolicy policy = mobileDataEnabled ? HttpRequestPolicy.ALWAYS_ALLOWED : new HttpRequestPolicy.AllowOnWifi(this.context);
+        jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
     public void startup(Map<String, Object> defaultPrefs) throws ExecutionException {

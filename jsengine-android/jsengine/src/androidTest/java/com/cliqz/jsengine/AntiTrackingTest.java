@@ -21,7 +21,7 @@ public class AntiTrackingTest {
     @Test
     public void testBasicApi() throws Exception {
         Context appContext = InstrumentationRegistry.getTargetContext();
-        Engine extension = new Engine(appContext);
+        Engine extension = new Engine(appContext, true);
         AntiTracking attrack = new AntiTracking(extension);
         extension.startup(attrack.getDefaultPrefs());
         attrack.setEnabled(true);
