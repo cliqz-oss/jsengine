@@ -1,7 +1,6 @@
 package com.cliqz.jsengine;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.JSConsole;
@@ -65,28 +64,11 @@ public class Engine {
         startup(new HashMap<String, Object>());
     }
 
-    /**
-     * Run the normal startup asynchronously on a different thread
-     * @param defaultPrefs
-     */
-    public void startupAsync(final Map<String, Object> defaultPrefs) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Engine.this.startup(defaultPrefs);
-                } catch (ExecutionException e) {
-                    Log.e(Engine.TAG, "Problem with startup", e);
-                }
-            }
-        }).start();
-    }
-
     public void shutdown() {
         jsengine.shutdown();
     }
 
-    public synchronized void setPref(String prefName, Object value) throws ExecutionException {
+    public synchronized void setPref(final String prefName, final Object value) throws ExecutionException {
         system.callFunctionOnModuleDefault("core/utils", "setPref", prefName, value);
     }
 
