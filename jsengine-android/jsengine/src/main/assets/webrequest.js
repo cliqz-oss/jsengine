@@ -18,7 +18,6 @@ var webRequest = {
           const requestInfo = JSON.parse(requestInfoJson);
           try {
               const response = webRequest.onBeforeRequest._trigger(requestInfo) || {};
-              console.log(JSON.stringify(response));
               return JSON.stringify(response);
           } catch(e) {
             console.error('webrequest trigger error', e);

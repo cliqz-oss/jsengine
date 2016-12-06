@@ -54,7 +54,6 @@ public class Engine {
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
             jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
             system.callVoidFunctionOnModule("platform/startup", "default");
-//            jsengine.executeScript("System.import('platform/startup').then(function(mod) { mod.default() }).catch(function(err) { console.log(err) } );");
         } catch(IOException e) {
             throw new ExecutionException(e);
         }
