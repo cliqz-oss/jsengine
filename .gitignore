@@ -2,3 +2,5 @@
 gradle/
 gradlew*
 .gradle/
+build/
+*.iml
