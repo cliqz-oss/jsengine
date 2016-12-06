@@ -1,6 +1,7 @@
 package com.cliqz.jsengine;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.JSConsole;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Engine {
 
+    private final static String TAG = Engine.class.getSimpleName();
     final V8Engine jsengine;
     private final Context context;
     private final Set<Object> jsApis = new HashSet<>();
@@ -47,7 +49,7 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
-    public void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
+    public synchronized void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
         try {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
@@ -63,15 +65,32 @@ public class Engine {
         startup(new HashMap<String, Object>());
     }
 
+    /**
+     * Run the normal startup asynchronously on a different thread
+     * @param defaultPrefs
+     */
+    public void startupAsync(final Map<String, Object> defaultPrefs) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Engine.this.startup(defaultPrefs);
+                } catch (ExecutionException e) {
+                    Log.e(Engine.TAG, "Problem with startup", e);
+                }
+            }
+        }).start();
+    }
+
     public void shutdown() {
         jsengine.shutdown();
     }
 
-    public void setPref(String prefName, Object value) throws ExecutionException {
+    public synchronized void setPref(String prefName, Object value) throws ExecutionException {
         system.callFunctionOnModuleDefault("core/utils", "setPref", prefName, value);
     }
 
-    public Object getPref(String prefName) throws ExecutionException {
+    public synchronized Object getPref(String prefName) throws ExecutionException {
         return system.callFunctionOnModuleDefault("core/utils", "getPref");
     }
 
