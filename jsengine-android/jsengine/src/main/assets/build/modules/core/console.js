@@ -9,7 +9,7 @@ System.register("core/console", ["platform/console", "core/prefs"], function (_e
       prefs = _corePrefs["default"];
     }],
     execute: function () {
-      isLoggingEnabled = prefs.get('showConsoleLogs', true);
+      isLoggingEnabled = prefs.get('showConsoleLogs', false);
       log = undefined;
       error = undefined;
 

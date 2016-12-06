@@ -32,7 +32,6 @@ var webRequest = {
           for (let listener of this.listeners) {
               const {fn, filter, extraInfo} = listener;
               const blockingResponse = fn(requestInfo);
-              console.log(JSON.stringify(blockingResponse));
               if (blockingResponse && Object.keys(blockingResponse).length > 0) {
                 return blockingResponse;
               }

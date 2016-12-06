@@ -162,7 +162,6 @@ System.register('core/app', ['system', './config', './console', './events', './p
         }, {
           key: 'onPrefChange',
           value: function onPrefChange(pref) {
-            console.log('xxx', pref);
             if (!pref.startsWith('modules.')) {
               return;
             }
@@ -180,7 +179,6 @@ System.register('core/app', ['system', './config', './console', './events', './p
               // pref for non-existing module - just ignore
               return;
             }
-            console.log('xxx', isEnabled, module.isEnabled);
 
             if (isEnabled === true && !module.isEnabled) {
               this.enableModule(module.name);

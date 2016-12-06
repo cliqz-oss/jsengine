@@ -94,5 +94,8 @@ public class Engine {
         return system.callFunctionOnModuleDefault("core/utils", "getPref");
     }
 
+    public void setLoggingEnabled(boolean enabled) throws ExecutionException {
+        setPref("showConsoleLogs", enabled);
+    }
 
 }
