@@ -12,6 +12,7 @@ import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.V8ResultUndefined;
+import com.eclipsesource.v8.V8ScriptExecutionException;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -287,21 +288,50 @@ public class SystemLoader {
         }
     }
 
-    public Object callFunctionOnModuleDefault(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
+    public void callVoidFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {
+        try {
+            final Object result = callFunctionOnModuleAttribute(modulePath, attribute, functionName, args);
+            if (result instanceof V8Object) {
+                engine.asyncQuery(new V8Engine.Query<Object>() {
+                    @Override
+                    public Object query(V8 runtime) {
+                        ((V8Object) result).release();
+                        return null;
+                    }
+                });
+            }
+        } catch (InterruptedException e) {
+            if (e.getCause() instanceof V8ResultUndefined) {
+                return;
+            }
+            throw new ExecutionException(e);
+        } catch (V8ResultUndefined e) {
+        }
+    }
+
+    public Object callFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {
         try {
             return engine.queryEngine(new V8Engine.Query<Object>() {
                 @Override
                 public Object query(V8 runtime) {
-                    V8Object moduleDefault = null;
+                    final int depth = attribute.length;
+                    V8Object[] objStack = new V8Object[depth + 1];
                     try {
                         final V8Object module = loadModuleInternal(modulePath);
-                        moduleDefault = module.getObject("default");
-                        return callFunctionOnObject(moduleDefault, functionName, args);
+                        objStack[0] = module;
+                        for (int i=0; i<depth; i++) {
+                            objStack[i+1] = objStack[i].getObject(attribute[i]);
+                        }
+                        return callFunctionOnObject(objStack[depth], functionName, args);
                     } catch (ExecutionException e) {
                         throw new QueryException(e);
                     } finally {
-                        if (moduleDefault != null)
-                            moduleDefault.release();
+                        // module release is handled by loadModuleInternal
+                        for (int i=1; i<depth + 1; i++) {
+                            if (objStack[i] != null) {
+                                objStack[i].release();
+                            }
+                        }
                     }
                 }
             });
@@ -310,12 +340,12 @@ public class SystemLoader {
         }
     }
 
+    public Object callFunctionOnModuleDefault(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
+        return callFunctionOnModuleAttribute(modulePath, new String[] {"default"}, functionName, args);
+    }
+
     private Object callFunctionOnObject(final V8Object obj, final String functionName, final Object... args) {
         // check if this is a valid function name
-        Set<String> moduleKeys = new HashSet<String>(Arrays.asList(obj.getKeys()));
-        if (!moduleKeys.contains(functionName) || obj.getType(functionName) != 7) {
-            throw new RuntimeException(obj + ".default has no function named "+ functionName);
-        }
         final Object fnResult = obj.executeJSFunction(functionName, args);
         if (fnResult instanceof V8Object) {
             try {

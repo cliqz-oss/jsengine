@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Engine {
 
+    private final static String TAG = Engine.class.getSimpleName();
     final V8Engine jsengine;
     private final Context context;
     private final Set<Object> jsApis = new HashSet<>();
@@ -47,14 +48,13 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
-    public void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
+    public synchronized void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
         try {
             // load config
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
             jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
             system.callVoidFunctionOnModule("platform/startup", "default");
-//            jsengine.executeScript("System.import('platform/startup').then(function(mod) { mod.default() }).catch(function(err) { console.log(err) } );");
         } catch(IOException e) {
             throw new ExecutionException(e);
         }
@@ -68,13 +68,16 @@ public class Engine {
         jsengine.shutdown();
     }
 
-    public void setPref(String prefName, Object value) throws ExecutionException {
+    public synchronized void setPref(final String prefName, final Object value) throws ExecutionException {
         system.callFunctionOnModuleDefault("core/utils", "setPref", prefName, value);
     }
 
-    public Object getPref(String prefName) throws ExecutionException {
+    public synchronized Object getPref(String prefName) throws ExecutionException {
         return system.callFunctionOnModuleDefault("core/utils", "getPref");
     }
 
+    public void setLoggingEnabled(boolean enabled) throws ExecutionException {
+        setPref("showConsoleLogs", enabled);
+    }
 
 }

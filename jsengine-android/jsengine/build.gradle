@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "24.0.2"
 
     defaultConfig {
@@ -26,22 +26,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
 
-    androidTestCompile "com.eclipsesource.j2v8:j2v8:4.5.0@aar"
-    compile "com.eclipsesource.j2v8:j2v8:4.5.0@aar"
-}
-
-apply plugin: "maven"
-
-group = "com.cliqz"
-version = "0.1"
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: "file://${System.getenv('HOME')}/.m2/repository")
-        }
-    }
+    androidTestCompile "com.eclipsesource.j2v8:j2v8:4.6.0@aar"
+    compile "com.eclipsesource.j2v8:j2v8:4.6.0@aar"
 }

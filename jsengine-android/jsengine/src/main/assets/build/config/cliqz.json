@@ -1,0 +1,1 @@
+{"platform":"jsengine","settings":{"antitrackingButton":false,"telemetryProvider":"platform/telemetry","frameScriptWhitelist":["http://localhost:3000/"]},"modules":["core","antitracking","adblocker"],"buildEnv":"development","sourceMaps":false,"EXTENSION_VERSION":"1.12.0"}
