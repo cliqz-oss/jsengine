@@ -69,7 +69,6 @@ public class AntiTracking {
     public boolean isWhitelisted(final String url) {
         try {
             final Object whitelisted = engine.system.callFunctionOnModuleDefault(MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
-            Log.d(TAG, whitelisted.toString());
             return whitelisted.equals(Boolean.TRUE);
         } catch (ExecutionException e) {
             Log.e(TAG, "isWhitelisted", e);

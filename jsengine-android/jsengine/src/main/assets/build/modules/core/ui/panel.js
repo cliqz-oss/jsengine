@@ -15,9 +15,9 @@ System.register('core/ui/panel', ['../utils', '../helpers/maybe'], function (_ex
     }],
     execute: function () {
       _default = (function () {
-        function _default(window, url, id) {
-          var autohide = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
-          var actions = arguments.length <= 4 || arguments[4] === undefined ? {} : arguments[4];
+        function _default(window, url, id, type) {
+          var autohide = arguments.length <= 4 || arguments[4] === undefined ? true : arguments[4];
+          var actions = arguments.length <= 5 || arguments[5] === undefined ? {} : arguments[5];
 
           _classCallCheck(this, _default);
 
@@ -28,6 +28,7 @@ System.register('core/ui/panel', ['../utils', '../helpers/maybe'], function (_ex
           this.autohide = autohide;
           this.actions = actions;
           this.shouldBeOpen = false;
+          this.type = type;
 
           this.onShowing = this.onShowing.bind(this);
           this.onHiding = this.onHiding.bind(this);
@@ -112,6 +113,11 @@ System.register('core/ui/panel', ['../utils', '../helpers/maybe'], function (_ex
 
             this.createIframe();
             this.panel.querySelector('vbox').appendChild(this.iframe);
+            utils.telemetry({
+              type: this.type,
+              target: 'icon',
+              action: 'click'
+            });
 
             // TODO: need a better way to attach those events
             utils.setTimeout(function () {

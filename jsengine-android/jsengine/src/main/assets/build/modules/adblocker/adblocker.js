@@ -3,7 +3,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
   // import CliqzHumanWeb from 'human-web/human-web';
   'use strict';
 
-  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzUtils, SERIALIZED_ENGINE_PATH, ADB_VER, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
+  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzHumanWeb, CliqzUtils, SERIALIZED_ENGINE_PATH, ADB_VER, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -69,6 +69,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
       Resource = _coreResourceLoader.Resource;
     }],
     execute: function () {
+      CliqzHumanWeb = undefined;
       CliqzUtils = utils;
 
       // Disk persisting
@@ -187,7 +188,9 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
         _createClass(AdBlocker, [{
           key: 'log',
           value: function log(msg) {
-            this.logs.push(msg);
+            var date = new Date();
+            var message = date.getHours() + ':' + date.getMinutes() + ' ' + msg;
+            this.logs.push(message);
             CliqzUtils.log(msg, 'adblocker');
           }
         }, {
@@ -236,7 +239,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
               // Load files from disk, then check if we should update
               _this2.listsManager.load().then(function () {
                 // Update check should be performed after a short while
-                CliqzUtils.log('Check for updates', 'adblocker');
+                _this2.log('Check for updates');
                 setTimeout(function () {
                   return _this2.listsManager.update();
                 }, 30 * 1000);
