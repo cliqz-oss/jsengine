@@ -17,6 +17,8 @@ import java.util.concurrent.ExecutionException;
 
 public class AntiTracking {
 
+    private final static String TAG = AntiTracking.class.getSimpleName();
+
     private final static String MODULE_NAME = "antitracking";
     private final static String ENABLE_PREF = "antiTrackTest";
     private final static String QSBLOCKING_PREF = "attrackRemoveQueryStringTracking";
@@ -52,11 +54,10 @@ public class AntiTracking {
 
     public JSONObject getTabBlockingInfo(final int tabId) {
         try {
-            final Object blockingInfo = engine.system.callFunctionOnModuleDefault("antitracking/attrack", "getTabBlockingInfo", tabId, webRequest.getUrlForTab(tabId));
-            Log.d("XXX", blockingInfo.toString());
+            final Object blockingInfo = engine.system.callFunctionOnModuleDefault(MODULE_NAME + "/attrack", "getTabBlockingInfo", tabId, webRequest.getUrlForTab(tabId));
             return new JSONObject(blockingInfo.toString());
         } catch (ExecutionException e) {
-            Log.e("attrack", "getTabBlockingInfo error", e);
+            Log.e(TAG, "getTabBlockingInfo", e);
         } catch (JSONException e) {
             // shouldn't happen - the parsed json comes directly from JSON.stringify in JS
             throw new RuntimeException(e);
@@ -64,4 +65,32 @@ public class AntiTracking {
         // on failure return empty object
         return new JSONObject();
     }
+
+    public boolean isWhitelisted(final String url) {
+        try {
+            final Object whitelisted = engine.system.callFunctionOnModuleDefault(MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
+            Log.d(TAG, whitelisted.toString());
+            return whitelisted.equals(Boolean.TRUE);
+        } catch (ExecutionException e) {
+            Log.e(TAG, "isWhitelisted", e);
+        }
+        return false;
+    }
+
+    public void addDomainToWhitelist(final String url) {
+        try {
+            engine.system.callVoidFunctionOnModuleAttribute(MODULE_NAME + "/attrack", new String[]{"default"}, "addSourceDomainToWhitelist", url);
+        } catch (ExecutionException e) {
+            Log.e(TAG, "addDomainToWhitelist", e);
+        }
+    }
+
+    public void removeDomainFromWhitelist(final String url) {
+        try {
+            engine.system.callVoidFunctionOnModuleAttribute(MODULE_NAME + "/attrack", new String[]{"default"}, "removeSourceDomainFromWhitelist", url);
+        } catch (ExecutionException e) {
+            Log.e(TAG, "removeDomainFromWhitelist", e);
+        }
+    }
+
 }
