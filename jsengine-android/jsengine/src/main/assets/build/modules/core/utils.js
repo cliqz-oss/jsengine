@@ -706,12 +706,20 @@ System.register("core/utils", ["platform/environment", "core/console", "core/pre
                   for (var k in config) {
                     CliqzUtils.setPref('config_' + k, config[k]);
                   }
-                } catch (e) {}
+                  if (CliqzUtils.getPref('backend_country', '') === '') {
+                    CliqzUtils.setPref('backend_country', CliqzUtils.getPref('config_location', ''));
+                  }
+                } catch (e) {
+                  CliqzUtils.log(e);
+                }
               }
               resolve();
             }, resolve, //on error the callback still needs to be called
             2000);
           });
+        },
+        setDefaultIndexCountry: function setDefaultIndexCountry(country) {
+          CliqzUtils.setPref('backend_country', country);
         },
         encodeLocale: function encodeLocale() {
           // send browser language to the back-end
@@ -719,7 +727,7 @@ System.register("core/utils", ["platform/environment", "core/console", "core/pre
         },
         encodeCountry: function encodeCountry() {
           //international results not supported
-          return '&force_country=true';
+          return '&country=' + CliqzUtils._country;
         },
         disableWikiDedup: function disableWikiDedup() {
           // disable wikipedia deduplication on the backend side
@@ -767,6 +775,7 @@ System.register("core/utils", ["platform/environment", "core/console", "core/pre
         // number of queries in search session
         _queryCount: null,
         setSearchSession: function setSearchSession(rand) {
+          CliqzUtils._country = CliqzUtils.getPref('backend_country');
           CliqzUtils._searchSession = rand;
           CliqzUtils._sessionSeq = 0;
           CliqzUtils._queryCount = 0;

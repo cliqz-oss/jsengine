@@ -1,7 +1,7 @@
-System.register('antitracking/bloom-filter', ['promise', 'antitracking/md5', 'antitracking/time', 'antitracking/pacemaker', 'antitracking/qs-whitelist-base', 'core/cliqz', 'core/resource-loader', 'core/console'], function (_export) {
+System.register('antitracking/bloom-filter', ['promise', 'antitracking/md5', 'antitracking/time', 'antitracking/pacemaker', 'antitracking/qs-whitelist-base', 'core/cliqz', 'core/resource-loader'], function (_export) {
   'use strict';
 
-  var Promise, md5, datetime, pacemaker, QSWhitelistBase, utils, Resource, console, BLOOMFILTER_BASE_URL, BLOOMFILTER_CONFIG, UPDATE_EXPIRY_HOURS, AttrackBloomFilter;
+  var Promise, md5, datetime, pacemaker, QSWhitelistBase, utils, Resource, BLOOMFILTER_BASE_URL, BLOOMFILTER_CONFIG, UPDATE_EXPIRY_HOURS, AttrackBloomFilter;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -47,8 +47,6 @@ System.register('antitracking/bloom-filter', ['promise', 'antitracking/md5', 'an
       utils = _coreCliqz.utils;
     }, function (_coreResourceLoader) {
       Resource = _coreResourceLoader.Resource;
-    }, function (_coreConsole) {
-      console = _coreConsole['default'];
     }],
     execute: function () {
 
@@ -159,7 +157,6 @@ System.register('antitracking/bloom-filter', ['promise', 'antitracking/md5', 'an
 
             // try remote update before local
             this._config.updateFromRemote()['catch'](function () {
-              console.log('updateFromLocal', 'xxx');
               return _this._config.load();
             }).then(this.checkUpdate.bind(this)).then(function () {
               _this.lastUpdate = datetime.getTime();

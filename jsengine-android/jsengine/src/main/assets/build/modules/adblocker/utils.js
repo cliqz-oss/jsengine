@@ -8,7 +8,7 @@ System.register('adblocker/utils', ['adblocker/adblocker'], function (_export) {
   function log(msg) {
     var message = '[adblock] ' + msg;
     if (CliqzADB.adbDebug) {
-      logDebug(message + '\n', 'xxx');
+      dump(message + '\n');
     }
   }
 
