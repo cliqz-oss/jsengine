@@ -115,7 +115,7 @@ public class WebRequest {
         }
     }
 
-    public AnnotatedWebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
+    public WebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
         final boolean isMainDocument = request.isForMainFrame();
         final Uri requestUrl = request.getUrl();
 
@@ -298,11 +298,11 @@ public class WebRequest {
 
     public class AnnotatedWebResourceResponse extends WebResourceResponse {
 
-        public final String source;
-
         AnnotatedWebResourceResponse(String source, String mimeType, String encoding, InputStream data) {
             super(mimeType, encoding, data);
-            this.source = source;
+            // add annotation to reason phrase
+            if (source.length() > 0)
+                this.setStatusCodeAndReasonPhrase(this.getStatusCode(), source);
         }
 
     }
