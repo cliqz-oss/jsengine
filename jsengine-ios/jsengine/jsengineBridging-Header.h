@@ -10,5 +10,6 @@
 #define Header_h
 
 #import "ThirdParty/WindowTimers.h"
+#import <CommonCrypto/CommonDigest.h>
 
 #endif /* Header_h */

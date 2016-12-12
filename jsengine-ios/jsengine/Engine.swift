@@ -31,6 +31,8 @@ public class Engine {
                 self?.fileIO = FileIO(queue:queue)
                 self?.fileIO!.extend(jsengine)
                 
+                let crypto = Crypto()
+                crypto.extend(jsengine)
             }
         }
     }
