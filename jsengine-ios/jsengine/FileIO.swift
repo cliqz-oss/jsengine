@@ -21,19 +21,26 @@ class FileIO {
     
     public func extend(context: JSContext) {
         let fs = JSValue.init(newObjectInContext: context)
-        let readFile : @convention(block) (String, JSValue) -> () = { path, callback in
-            dispatch_async(self.queue) {[weak self] in
-                self?.readFile(path, callback: callback)
+        let readFile : @convention(block) (String, JSValue) -> () = {[weak self] path, callback in
+            if let queue = self?.queue {
+                dispatch_async(queue) {[weak self] in
+                    self?.readFile(path, callback: callback)
+                }
+            }
+            
+        }
+        let writeFile : @convention(block) (String, String) -> () = {[weak self] path, data in
+            if let queue = self?.queue {
+                dispatch_async(queue) {[weak self] in
+                    self?.writeFile(path, data: data)
+                }
             }
         }
-        let writeFile : @convention(block) (String, String) -> () = { path, data in
-            dispatch_async(self.queue) {[weak self] in
-                self?.writeFile(path, data: data)
-            }
-        }
-        let deleteFile : @convention(block) (String) -> () = { path in
-            dispatch_async(self.queue) {[weak self] in
-                self?.deleteFile(path)
+        let deleteFile : @convention(block) (String) -> () = {[weak self] path in
+            if let queue = self?.queue {
+                dispatch_async(queue) {[weak self] in
+                    self?.deleteFile(path)
+                }
             }
         }
         
