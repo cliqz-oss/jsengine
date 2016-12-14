@@ -49,11 +49,11 @@ public class AdblockerTest {
             }
         });
 
-        final String testUrl = "cliqz.com";
+        final String testUrl = "https://cliqz.com";
         assertFalse(adb.isBlacklisted(testUrl));
-        adb.toggleUrl(testUrl);
+        adb.toggleUrl(testUrl, true);
         assertTrue(adb.isBlacklisted(testUrl));
-        adb.toggleUrl(testUrl);
+        adb.toggleUrl(testUrl, true);
         assertFalse(adb.isBlacklisted(testUrl));
 
         extension.shutdown();

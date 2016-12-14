@@ -3,7 +3,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
   // import CliqzHumanWeb from 'human-web/human-web';
   'use strict';
 
-  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzHumanWeb, CliqzUtils, SERIALIZED_ENGINE_PATH, ADB_VER, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
+  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzUtils, CliqzHumanWeb, SERIALIZED_ENGINE_PATH, ADB_VER, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -69,8 +69,8 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
       Resource = _coreResourceLoader.Resource;
     }],
     execute: function () {
-      CliqzHumanWeb = undefined;
       CliqzUtils = utils;
+      CliqzHumanWeb = undefined;
 
       // Disk persisting
       SERIALIZED_ENGINE_PATH = ['antitracking', 'adblocking', 'engine.json'];
@@ -161,20 +161,6 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
 
             // Flush the cache since the engine is now different
             _this.initCache();
-
-            // Serialize new version of the engine on disk if needed
-            if (_this.engine.updated) {
-              (function () {
-                var t0 = Date.now();
-                new Resource(SERIALIZED_ENGINE_PATH).persist(JSON.stringify(serializeFiltersEngine(_this.engine))).then(function () {
-                  var totalTime = Date.now() - t0;
-                  _this.log('Serialized filters engine on disk (' + totalTime + ' ms)');
-                  _this.engine.updated = false;
-                });
-              })();
-            } else {
-              _this.log('Engine has not been updated, do not serialize');
-            }
           });
 
           // Blacklists to disable adblocking on certain domains/urls
@@ -216,34 +202,13 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
 
             this.initCache();
 
-            // Load serialized engine from disk, then init filters manager
-            new Resource(SERIALIZED_ENGINE_PATH).load().then(function (serializedEngine) {
-              if (serializedEngine !== undefined) {
-                try {
-                  var t0 = Date.now();
-                  deserializeFiltersEngine(_this2.engine, serializedEngine);
-                  var totalTime = Date.now() - t0;
-                  _this2.log('Loaded filters engine from disk (' + totalTime + ' ms)');
-                } catch (e) {
-                  // In case there is a mismatch between the version of the code
-                  // and the serialization format of the engine on disk, we might
-                  // not be able to load the engine from disk. Then we just start
-                  // fresh!
-                  _this2.engine = new FilterEngine();
-                  _this2.log('Exception while loading engine from disk ' + e + ' ' + e.stack);
-                }
-              } else {
-                _this2.log('No filter engine was serialized on disk');
-              }
-
-              // Load files from disk, then check if we should update
-              _this2.listsManager.load().then(function () {
-                // Update check should be performed after a short while
-                _this2.log('Check for updates');
-                setTimeout(function () {
-                  return _this2.listsManager.update();
-                }, 30 * 1000);
-              });
+            // Load files from disk, then check if we should update
+            this.listsManager.load().then(function () {
+              // Update check should be performed after a short while
+              _this2.log('Check for updates');
+              setTimeout(function () {
+                return _this2.listsManager.update();
+              }, 30 * 1000);
             });
 
             this.blacklistPersist.load().then(function (value) {
