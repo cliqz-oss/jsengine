@@ -14,26 +14,25 @@ public class Engine {
     var jsengine: JSContext? = nil
     private let dispatchQueue = dispatch_queue_create("com.cliqz.AntiTracking", DISPATCH_QUEUE_SERIAL)
     
-    
     var fileIO: FileIO?
-    
+    var http: HttpHandler?
     
     public init() {
-        dispatch_async(dispatchQueue) {[weak self] in
-            self?.jsengine = JSContext()
-            self?.jsengine!.exceptionHandler = { context, exception in
+        dispatch_async(dispatchQueue) {
+            self.jsengine = JSContext()
+            self.jsengine!.exceptionHandler = { context, exception in
                 print("JS Error: \(exception)")
             }
-            let w = WTWindowTimers(self?.dispatchQueue)
-            w.extend(self?.jsengine)
-            
-            if let queue = self?.dispatchQueue, jsengine = self?.jsengine {
-                self?.fileIO = FileIO(queue:queue)
-                self?.fileIO!.extend(jsengine)
+            let w = WTWindowTimers(self.dispatchQueue)
+            w.extend(self.jsengine)
+            self.fileIO = FileIO(queue:self.dispatchQueue)
+            self.fileIO!.extend(self.jsengine!)
                 
-                let crypto = Crypto()
-                crypto.extend(jsengine)
-            }
+            let crypto = Crypto()
+            crypto.extend(self.jsengine!)
+
+            self.http = HttpHandler()
+            self.http!.extend(self.jsengine!)
         }
     }
     

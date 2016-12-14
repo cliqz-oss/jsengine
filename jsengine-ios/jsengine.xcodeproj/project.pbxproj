@@ -22,6 +22,7 @@
 		B30042161DF867B5004F9E14 /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30042151DF867B5004F9E14 /* FileIO.swift */; };
 		B30042231DF86B66004F9E14 /* WindowTimers.h in Headers */ = {isa = PBXBuildFile; fileRef = B30042211DF86B66004F9E14 /* WindowTimers.h */; };
 		B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */ = {isa = PBXBuildFile; fileRef = B30042221DF86B66004F9E14 /* WindowTimers.m */; };
+		B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3429D2B1DFEA69000F27916 /* HttpHandler.swift */; };
 		B3CEA5D31DF6CA0000880EF8 /* jsengine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */; };
 		B3CEA5D81DF6CA0000880EF8 /* jsengineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CEA5D71DF6CA0000880EF8 /* jsengineTests.swift */; };
 /* End PBXBuildFile section */
@@ -74,6 +75,7 @@
 		B30042211DF86B66004F9E14 /* WindowTimers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowTimers.h; sourceTree = "<group>"; };
 		B30042221DF86B66004F9E14 /* WindowTimers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowTimers.m; sourceTree = "<group>"; };
 		B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jsengineBridging-Header.h"; sourceTree = "<group>"; };
+		B3429D2B1DFEA69000F27916 /* HttpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpHandler.swift; path = jsengine/HttpHandler.swift; sourceTree = SOURCE_ROOT; };
 		B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = jsengine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CEA5CD1DF6CA0000880EF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B3CEA5D21DF6CA0000880EF8 /* jsengineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jsengineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -212,6 +214,7 @@
 				B30042151DF867B5004F9E14 /* FileIO.swift */,
 				8669E2371DFAE7D600B6D9F1 /* Crypto.swift */,
 				B30041CF1DF85071004F9E14 /* JSConsole.swift */,
+				B3429D2B1DFEA69000F27916 /* HttpHandler.swift */,
 				B3CEA5CD1DF6CA0000880EF8 /* Info.plist */,
 				B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */,
 			);
@@ -506,6 +509,7 @@
 				8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */,
 				B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */,
 				B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */,
+				B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -845,6 +849,7 @@
 				B30041DC1DF86206004F9E14 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B30042061DF8639C004F9E14 /* Build configuration list for PBXNativeTarget "TestApp" */ = {
 			isa = XCConfigurationList;
@@ -853,6 +858,7 @@
 				B30042081DF8639C004F9E14 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B30042091DF8639C004F9E14 /* Build configuration list for PBXNativeTarget "TestAppTests" */ = {
 			isa = XCConfigurationList;
@@ -861,6 +867,7 @@
 				B300420B1DF8639C004F9E14 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B300420C1DF8639C004F9E14 /* Build configuration list for PBXNativeTarget "TestAppUITests" */ = {
 			isa = XCConfigurationList;
@@ -869,6 +876,7 @@
 				B300420E1DF8639C004F9E14 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B3CEA5C31DF6CA0000880EF8 /* Build configuration list for PBXProject "jsengine" */ = {
 			isa = XCConfigurationList;
