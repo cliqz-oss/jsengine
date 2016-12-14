@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8669E2371DFAE7D600B6D9F1 /* Crypto.swift */; };
 		B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041C51DF84EAB004F9E14 /* Engine.swift */; };
 		B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041CF1DF85071004F9E14 /* JSConsole.swift */; };
 		B30041D81DF86206004F9E14 /* UITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041D71DF86206004F9E14 /* UITest.swift */; };
@@ -50,6 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8669E2371DFAE7D600B6D9F1 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		B30041C51DF84EAB004F9E14 /* Engine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		B30041CF1DF85071004F9E14 /* JSConsole.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSConsole.swift; sourceTree = "<group>"; };
 		B30041D51DF86206004F9E14 /* UITest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UITest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -208,6 +210,7 @@
 				B30042201DF86B04004F9E14 /* ThirdParty */,
 				B30041C51DF84EAB004F9E14 /* Engine.swift */,
 				B30042151DF867B5004F9E14 /* FileIO.swift */,
+				8669E2371DFAE7D600B6D9F1 /* Crypto.swift */,
 				B30041CF1DF85071004F9E14 /* JSConsole.swift */,
 				B3CEA5CD1DF6CA0000880EF8 /* Info.plist */,
 				B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */,
@@ -500,6 +503,7 @@
 			files = (
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,
 				B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */,
+				8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */,
 				B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */,
 				B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */,
 			);
