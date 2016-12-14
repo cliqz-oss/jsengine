@@ -1,20 +1,21 @@
-System.register('adblocker/utils', ['adblocker/adblocker'], function (_export) {
+System.register('adblocker/utils', ['core/console'], function (_export) {
+  // import CliqzADB from 'adblocker/adblocker';
   'use strict';
 
-  var CliqzADB;
+  var console;
 
   _export('log', log);
 
   function log(msg) {
     var message = '[adblock] ' + msg;
-    if (CliqzADB.adbDebug) {
-      dump(message + '\n');
+    if (true) {
+      console.log('' + message);
     }
   }
 
   return {
-    setters: [function (_adblockerAdblocker) {
-      CliqzADB = _adblockerAdblocker['default'];
+    setters: [function (_coreConsole) {
+      console = _coreConsole['default'];
     }],
     execute: function () {}
   };
