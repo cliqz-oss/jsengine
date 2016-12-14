@@ -12,6 +12,7 @@ import JavaScriptCore
 public class Engine {
     
     var jsengine: JSContext? = nil
+    var buildPath = "build"
     private let dispatchQueue = dispatch_queue_create("com.cliqz.AntiTracking", DISPATCH_QUEUE_SERIAL)
     
     var fileIO: FileIO?
@@ -31,7 +32,7 @@ public class Engine {
             let crypto = Crypto()
             crypto.extend(self.jsengine!)
 
-            self.http = HttpHandler()
+            self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
             self.http!.extend(self.jsengine!)
         }
     }

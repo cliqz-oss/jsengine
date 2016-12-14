@@ -23,6 +23,7 @@
 		B30042231DF86B66004F9E14 /* WindowTimers.h in Headers */ = {isa = PBXBuildFile; fileRef = B30042211DF86B66004F9E14 /* WindowTimers.h */; };
 		B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */ = {isa = PBXBuildFile; fileRef = B30042221DF86B66004F9E14 /* WindowTimers.m */; };
 		B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3429D2B1DFEA69000F27916 /* HttpHandler.swift */; };
+		B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */; };
 		B3CEA5D31DF6CA0000880EF8 /* jsengine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */; };
 		B3CEA5D81DF6CA0000880EF8 /* jsengineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CEA5D71DF6CA0000880EF8 /* jsengineTests.swift */; };
 /* End PBXBuildFile section */
@@ -76,6 +77,7 @@
 		B30042221DF86B66004F9E14 /* WindowTimers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowTimers.m; sourceTree = "<group>"; };
 		B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jsengineBridging-Header.h"; sourceTree = "<group>"; };
 		B3429D2B1DFEA69000F27916 /* HttpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpHandler.swift; path = jsengine/HttpHandler.swift; sourceTree = SOURCE_ROOT; };
+		B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeUrlHandler.swift; sourceTree = "<group>"; };
 		B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = jsengine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CEA5CD1DF6CA0000880EF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B3CEA5D21DF6CA0000880EF8 /* jsengineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jsengineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -211,6 +213,7 @@
 			children = (
 				B30042201DF86B04004F9E14 /* ThirdParty */,
 				B30041C51DF84EAB004F9E14 /* Engine.swift */,
+				B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */,
 				B30042151DF867B5004F9E14 /* FileIO.swift */,
 				8669E2371DFAE7D600B6D9F1 /* Crypto.swift */,
 				B30041CF1DF85071004F9E14 /* JSConsole.swift */,
@@ -504,6 +507,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */,
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,
 				B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */,
 				8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */,
