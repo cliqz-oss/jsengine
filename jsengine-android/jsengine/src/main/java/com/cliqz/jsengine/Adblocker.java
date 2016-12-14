@@ -66,9 +66,9 @@ public class Adblocker {
         return false;
     }
 
-    public void toggleUrl(final String url) {
+    public void toggleUrl(final String url, final boolean domain) {
         try {
-            engine.system.callFunctionOnModuleAttribute(MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "toggleUrl", url);
+            engine.system.callFunctionOnModuleAttribute(MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "toggleUrl", url, domain);
         } catch(ExecutionException e) {
             Log.e(TAG, "toggleUrl", e);
         }
