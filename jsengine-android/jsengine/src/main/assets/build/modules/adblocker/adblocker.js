@@ -391,12 +391,11 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
         adbMem: {},
         adbStats: new AdbStats(),
         mutationLogger: null,
-        adbDebug: true,
+        adbDebug: false,
         MIN_BROWSER_VERSION: 35,
         timers: [],
 
         init: function init() {
-          log('init');
           // Set `cliqz-adb` default to 'Disabled'
           if (CliqzUtils.getPref(ADB_PREF, undefined) === undefined) {
             CliqzUtils.setPref(ADB_PREF, ADB_PREF_VALUES.Disabled);

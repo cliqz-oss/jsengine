@@ -42,7 +42,7 @@ public class Adblocker {
 
     public void setEnabled(final boolean enabled) throws ExecutionException {
         engine.setPref(ABTEST_PREF, true);
-        engine.setPref(ENABLE_PREF, 1);
+        engine.setPref(ENABLE_PREF, enabled ? 1 : 0);
         engine.setPref("modules."+ MODULE_NAME + ".enabled", enabled);
     }
 
