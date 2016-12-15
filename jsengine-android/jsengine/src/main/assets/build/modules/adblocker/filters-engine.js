@@ -1298,17 +1298,17 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
                 var contentType = _resources$get.contentType;
 
                 var dataUrl = undefined;
-                if (contentType.includes(';')) {
-                  dataUrl = 'data:' + contentType + ',' + data;
-                } else {
-                  dataUrl = 'data:' + contentType + ';base64,' + btoa(data);
-                }
+                // if (contentType.includes(';')) {
+                //   dataUrl = `data:${contentType},${data}`;
+                // } else {
+                //   dataUrl = `data:${contentType};base64,${btoa(data)}`;
+                // }
 
                 return {
-                  match: true,
-                  redirect: dataUrl.trim()
+                  match: false
                 };
               }
+              // redirect: dataUrl.trim(),
               return { match: true };
             }
 
