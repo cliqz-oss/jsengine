@@ -51,7 +51,7 @@ public class Adblocker {
             final Object stats = engine.system.callFunctionOnModuleAttribute(MODULE_NAME + "/adblocker", new String[]{"default", "adbStats"}, "report", url);
             return new JSONObject(stats.toString());
         } catch(ExecutionException | JSONException e) {
-            Log.e(TAG, "getAdBlockingInfo", e);
+//            Log.e(TAG, "getAdBlockingInfo", e);
         }
         return new JSONObject();
     }
@@ -61,7 +61,7 @@ public class Adblocker {
             final Object blacklisted = engine.system.callFunctionOnModuleAttribute(MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "isDomainInBlacklist", url);
             return blacklisted.equals(Boolean.TRUE);
         } catch(ExecutionException e) {
-            Log.e(TAG, "isBlacklisted", e);
+//            Log.e(TAG, "isBlacklisted", e);
         }
         return false;
     }
@@ -70,7 +70,7 @@ public class Adblocker {
         try {
             engine.system.callFunctionOnModuleAttribute(MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "toggleUrl", url, domain);
         } catch(ExecutionException e) {
-            Log.e(TAG, "toggleUrl", e);
+//            Log.e(TAG, "toggleUrl", e);
         }
     }
 
