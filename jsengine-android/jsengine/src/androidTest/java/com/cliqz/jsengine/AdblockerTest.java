@@ -3,6 +3,7 @@ package com.cliqz.jsengine;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import com.cliqz.jsengine.v8.V8Engine;
 import com.eclipsesource.v8.V8;
@@ -32,7 +33,7 @@ public class AdblockerTest {
         Adblocker adb = new Adblocker(extension);
         extension.startup(adb.getDefaultPrefs());
         adb.setEnabled(true);
-        extension.shutdown();
+        //extension.shutdown();
     }
 
     @Test
@@ -59,7 +60,6 @@ public class AdblockerTest {
         adb.toggleUrl(testUrl, true);
         assertFalse(adb.isBlacklisted(testUrl));
 
-        extension.shutdown();
     }
 
     @Test
@@ -116,8 +116,6 @@ public class AdblockerTest {
                 return null;
             }
         });
-
-        extension.shutdown();
 
         if (tryCtr == MAX_TRIES) {
             fail();
