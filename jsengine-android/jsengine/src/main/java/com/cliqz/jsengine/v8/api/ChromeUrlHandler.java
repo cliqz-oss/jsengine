@@ -43,7 +43,7 @@ public class ChromeUrlHandler extends HttpHandler {
     public boolean chromeHandler(final String requestedUrl,
                                final V8Function callback, final V8Function onerror) {
         if (!requestedUrl.startsWith("file://") && !requestedUrl.startsWith("chrome://")) {
-            onerror.call(onerror, null);
+            doErrorCallback(callback, onerror);
             return false;
         }
 
