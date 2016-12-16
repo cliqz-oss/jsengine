@@ -12,6 +12,7 @@ import com.cliqz.jsengine.v8.api.FileIO;
 import com.cliqz.jsengine.v8.api.HttpRequestPolicy;
 import com.cliqz.jsengine.v8.api.SystemLoader;
 import com.cliqz.jsengine.v8.api.WebRequest;
+import com.eclipsesource.v8.utils.MemoryManager;
 
 import org.json.JSONObject;
 
@@ -37,9 +38,8 @@ public class Engine {
         this.context = context.getApplicationContext();
         jsengine = new V8Engine();
         // load js APIs
-
-        jsApis.add(new JSConsole(jsengine));
         jsApis.add(new Timers(jsengine));
+        jsApis.add(new JSConsole(jsengine));
         jsApis.add(new FileIO(jsengine, this.context));
         jsApis.add(new Crypto(jsengine));
         webRequest = new WebRequest(jsengine, this.context);
@@ -54,7 +54,7 @@ public class Engine {
             String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
             jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
             jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
-            system.callVoidFunctionOnModule("platform/startup", "default");
+            system.callVoidFunctionOnModule("platform/startup", "startup");
         } catch(IOException e) {
             throw new ExecutionException(e);
         }
@@ -64,12 +64,16 @@ public class Engine {
         startup(new HashMap<String, Object>());
     }
 
-    public void shutdown() {
-        jsengine.shutdown();
+    public void shutdown() throws ExecutionException {
+        try {
+            system.callVoidFunctionOnModule("platform/startup", "shutdown");
+        } finally {
+            jsengine.shutdown();
+        }
     }
 
     public synchronized void setPref(final String prefName, final Object value) throws ExecutionException {
-        system.callFunctionOnModuleDefault("core/utils", "setPref", prefName, value);
+        system.callVoidFunctionOnModuleAttribute("core/utils", new String[] {"default"}, "setPref", prefName, value);
     }
 
     public synchronized Object getPref(String prefName) throws ExecutionException {

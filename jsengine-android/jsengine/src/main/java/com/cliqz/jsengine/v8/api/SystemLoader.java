@@ -126,19 +126,14 @@ public class SystemLoader {
             final V8Function catchCb = catchCallback();
             final V8Array thenArgs = new V8Array(runtime).push(thenCb);
             final V8Array catchArgs = new V8Array(runtime).push(catchCb);
-//            V8Object intermediatePromise = null;
             try {
                 promise.executeVoidFunction("then", thenArgs);
                 promise.executeVoidFunction("catch", catchArgs);
-//                return intermediatePromise.executeObjectFunction("catch", catchArgs);
             } finally {
                 thenArgs.release();
                 catchArgs.release();
                 thenCb.release();
                 catchCb.release();
-//                if (intermediatePromise != null) {
-//                    intermediatePromise.release();
-//                }
                 promise.release();
             }
         }
@@ -154,16 +149,16 @@ public class SystemLoader {
         }
 
         @Override
-        public boolean isDone() {
-            synchronized (this) {
-                return thenResult != null || catchResult != null;
-            }
+        public synchronized boolean isDone() {
+            return thenResult != null || catchResult != null;
         }
 
         @Override
         public V8Object get() throws InterruptedException, ExecutionException {
-            while (!isDone()) {
-                wait();
+            synchronized (this) {
+                while (!isDone()) {
+                    wait();
+                }
             }
             try {
                 return getResult();
@@ -244,8 +239,8 @@ public class SystemLoader {
         } catch(InterruptedException e) {
             throw new ExecutionException(e);
         } finally {
-            moduleArgs.release();
             system.release();
+            moduleArgs.release();
         }
     }
 
@@ -314,24 +309,10 @@ public class SystemLoader {
             return engine.queryEngine(new V8Engine.Query<Object>() {
                 @Override
                 public Object query(V8 runtime) {
-                    final int depth = attribute.length;
-                    V8Object[] objStack = new V8Object[depth + 1];
                     try {
-                        final V8Object module = loadModuleInternal(modulePath);
-                        objStack[0] = module;
-                        for (int i=0; i<depth; i++) {
-                            objStack[i+1] = objStack[i].getObject(attribute[i]);
-                        }
-                        return callFunctionOnObject(objStack[depth], functionName, args);
+                        return makePrimitive(_callFunctionOnModuleAttribute(modulePath, attribute, functionName, args));
                     } catch (ExecutionException e) {
                         throw new QueryException(e);
-                    } finally {
-                        // module release is handled by loadModuleInternal
-                        for (int i=1; i<depth + 1; i++) {
-                            if (objStack[i] != null) {
-                                objStack[i].release();
-                            }
-                        }
                     }
                 }
             });
@@ -344,20 +325,46 @@ public class SystemLoader {
         return callFunctionOnModuleAttribute(modulePath, new String[] {"default"}, functionName, args);
     }
 
+    private Object _callFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {
+        final int depth = attribute.length;
+        V8Object[] objStack = new V8Object[depth + 1];
+        try {
+            final V8Object module = loadModuleInternal(modulePath);
+            objStack[0] = module;
+            for (int i=0; i<depth; i++) {
+                objStack[i+1] = objStack[i].getObject(attribute[i]);
+            }
+            return objStack[depth].executeJSFunction(functionName, args);
+        } catch (ExecutionException e) {
+            throw new QueryException(e);
+        } finally {
+            // module release is handled by loadModuleInternal
+            for (int i=1; i<depth + 1; i++) {
+                if (objStack[i] != null) {
+                    objStack[i].release();
+                }
+            }
+        }
+    }
+
     private Object callFunctionOnObject(final V8Object obj, final String functionName, final Object... args) {
         // check if this is a valid function name
         final Object fnResult = obj.executeJSFunction(functionName, args);
-        if (fnResult instanceof V8Object) {
+        return makePrimitive(fnResult);
+    }
+
+    private Object makePrimitive(Object maybeV8Object) {
+        if (maybeV8Object instanceof V8Object) {
             try {
-                if (((V8Object) fnResult).isUndefined())
+                if (((V8Object) maybeV8Object).isUndefined())
                     return null;
                 else
-                    return jsonifyObject((V8Object) fnResult);
+                    return jsonifyObject((V8Object) maybeV8Object);
             } finally {
-                ((V8Object) fnResult).release();
+                ((V8Object) maybeV8Object).release();
             }
         } else {
-            return fnResult;
+            return maybeV8Object;
         }
     }
 

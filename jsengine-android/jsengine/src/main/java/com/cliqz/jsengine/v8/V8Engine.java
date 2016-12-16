@@ -61,8 +61,8 @@ public class V8Engine implements JSEngine {
         Log.w(TAG, "V8 shutdown");
         for(Query q : shutdownHooks) {
             try {
-                asyncQuery(q);
-            } catch (InterruptedException | ExecutionException e) {
+                queryEngine(q);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 Log.e(TAG, "Exception in shutdown hook", e);
             }
         }

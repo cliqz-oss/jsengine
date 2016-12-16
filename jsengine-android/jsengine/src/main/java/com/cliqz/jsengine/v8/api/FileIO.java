@@ -9,6 +9,7 @@ import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Function;
 import com.eclipsesource.v8.V8Object;
+import com.eclipsesource.v8.utils.MemoryManager;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -88,6 +89,7 @@ public class FileIO {
             Log.e(TAG, Log.getStackTraceString(e));
         } finally {
             respArgs.release();
+            callback.release();
         }
     }
 
