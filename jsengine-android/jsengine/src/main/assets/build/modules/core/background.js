@@ -1,7 +1,7 @@
-System.register("core/background", ["core/cliqz", "./utils", "./console", "./language", "./config", "platform/process-script-manager", "./history-manager", "./prefs", "./base/background", "platform/browser", "platform/load-logo-db", "./platform"], function (_export) {
+System.register("core/background", ["core/cliqz", "./utils", "./console", "./language", "./config", "platform/process-script-manager", "./history-manager", "./prefs", "./base/background", "platform/browser", "platform/load-logo-db", "./platform", "core/resource-manager"], function (_export) {
   "use strict";
 
-  var events, Promise, utils, console, language, config, ProcessScriptManager, HistoryManager, prefs, background, Window, mapWindows, loadLogoDb, isMobile, lastRequestId, callbacks;
+  var events, Promise, utils, console, language, config, ProcessScriptManager, HistoryManager, prefs, background, Window, mapWindows, loadLogoDb, isMobile, resourceManager, lastRequestId, callbacks;
   return {
     setters: [function (_coreCliqz) {
       events = _coreCliqz.events;
@@ -29,6 +29,8 @@ System.register("core/background", ["core/cliqz", "./utils", "./console", "./lan
       loadLogoDb = _platformLoadLogoDb["default"];
     }, function (_platform) {
       isMobile = _platform.isMobile;
+    }, function (_coreResourceManager) {
+      resourceManager = _coreResourceManager["default"];
     }],
     execute: function () {
       lastRequestId = 0;
@@ -52,13 +54,18 @@ System.register("core/background", ["core/cliqz", "./utils", "./console", "./lan
           this.mm.init();
 
           this.report = utils.setTimeout(this.reportStartupTime.bind(this), 1000 * 60);
+
+          resourceManager.init();
         },
 
         unload: function unload() {
           utils.clearTimeout(this.report);
-          language.unload();
-          HistoryManager.unload();
+          if (!isMobile) {
+            language.unload();
+            HistoryManager.unload();
+          }
           this.mm.unload();
+          resourceManager.unload();
         },
 
         reportStartupTime: function reportStartupTime() {
