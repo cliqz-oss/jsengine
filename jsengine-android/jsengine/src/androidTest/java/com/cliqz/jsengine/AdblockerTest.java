@@ -12,6 +12,7 @@ import com.eclipsesource.v8.V8Object;
 import com.eclipsesource.v8.V8ResultUndefined;
 import com.eclipsesource.v8.utils.MemoryManager;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -108,6 +109,11 @@ public class AdblockerTest {
                 Thread.sleep(50);
             }
         } while(!isBlocked && tryCtr < MAX_TRIES);
+
+        // check adblock info is available
+        JSONObject adbInfo = adb.getAdBlockingInfo("http://www.bbc.com/");
+        assertTrue(adbInfo.getJSONObject("advertisersList").has("Effective Measure"));
+
         extension.jsengine.queryEngine(new V8Engine.Query<Object>() {
             @Override
             public Object query(V8 runtime) {
