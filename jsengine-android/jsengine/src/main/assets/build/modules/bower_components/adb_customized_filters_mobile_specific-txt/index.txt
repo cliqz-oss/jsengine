@@ -1,3 +1,4 @@
 @@||marfeel.com^$third-party,domain=vilaweb.cat|vilaweb.com
 @@||ebz.io^$third-party,domain=vilaweb.cat
 @@||2mdn.net^$~object-subrequest,third-party,domain=focus.de
+@@||sueddeutsche.de^$document

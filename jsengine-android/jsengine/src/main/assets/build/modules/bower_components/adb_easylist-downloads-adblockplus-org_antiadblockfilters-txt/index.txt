@@ -1,8 +1,8 @@
 [Adblock Plus 2.0]
-! Checksum: jji8vT2zkWRzTC2tgA9Rvw
-! Version: 201612040250
+! Checksum: V9l7lrqxehMqJ9eXBwSvnw
+! Version: 201612190250
 ! Title: Adblock Warning Removal List
-! Last modified: 04 Dec 2016 02:50 UTC
+! Last modified: 19 Dec 2016 02:50 UTC
 ! Expires: 1 days (update frequency)
 ! Homepage: https://easylist.to/
 !
@@ -74,6 +74,7 @@ shadbase.com##img[alt="adblock"]
 /antiadblockmsg.
 /simple-adblock-notice/*
 /wp-content/plugins/ad-block-defender/*
+/wp-content/plugins/deadblocker/*
 /wp-content/uploads/an-temp/*$script,stylesheet
 !
 ||bdgest.com/js/site.js?
@@ -82,6 +83,7 @@ shadbase.com##img[alt="adblock"]
 ||nrj.fr/nrj?Page=/rg.fake&
 ||skyrock.net/img/*/adblock/
 !
+@@/advertisement.js$script,~third-party,domain=fun-animes.fr
 @@/noadblock-nice-message/assets/js/ads.js?$script,~third-party
 !
 @@||ausujet.com/skins/common/ads.js
@@ -97,7 +99,7 @@ shadbase.com##img[alt="adblock"]
 @@||gamingroom.tv/static/img/advert.png?
 @@||grattable.com/blogads.css
 @@||hdnumerique.com/tpl/jscript/advert.js
-@@||hitek.fr/ad$script
+@@||impactmangas.fr/ads.js|$script,~third-party
 @@||item-voyage.fr/ads.css
 @@||jeux-geographiques.com/js/adblock_detector.js
 @@||jeuxvideo-live.com/js/ads.js
@@ -110,6 +112,7 @@ shadbase.com##img[alt="adblock"]
 @@||pagerank.fr/js*/advert.js?$script
 @@||penducado.com/styles/ads.css
 @@||presse-algerie.net/js/ads.js$script
+@@||primfx.com/js/ads.js|$script,~third-party
 @@||ps3-infos.fr/adsense/openads/ads/ads.js
 @@||ptitchef.com/js/ads.js
 @@||static.koreus.com/js/advert.js
@@ -158,6 +161,11 @@ shadbase.com##img[alt="adblock"]
 ##.adblock_enabled
 ##.adblock_floating_message
 ##.counterAdblocks
+##.deadblocker-header-bar
+##.deadblocker-header-bar-inner
+##.dispositifAdblock
+##.dispositifAdblockContent
+##.dispositifAdblockMessageBox
 ##.kill-adblock-container
 ##.noadblock
 ##.top-bar-adblock
@@ -204,6 +212,7 @@ usgang.ch###rectangle-wrapper
 ! *** antiadblockfilters:antiadblockfilters/antiadblock_latvian.txt ***
 ! *** antiadblockfilters:antiadblockfilters/antiadblock_romanian.txt ***
 ! *** antiadblockfilters:antiadblockfilters/antiadblock_russian.txt ***
+zakon.kz##.adblock_alert
 webdesign-master.ru###adbd
 vesti-ukr.com###adblockpopup
 happy-hack.ru###admitad-cookie-check-popup

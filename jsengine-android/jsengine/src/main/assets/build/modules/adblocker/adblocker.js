@@ -11,11 +11,6 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
 
   _export('adbABTestEnabled', adbABTestEnabled);
 
-  /* Wraps filter-based adblocking in a class. It has to handle both
-   * the management of lists (fetching, updating) using a FiltersLoader
-   * and the matching using a FilterEngine.
-   */
-
   _export('adbEnabled', adbEnabled);
 
   function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
@@ -37,6 +32,20 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
     return adbABTestEnabled() && CliqzUtils.getPref(ADB_PREF, ADB_PREF_VALUES.Disabled) !== 0;
   }
 
+  function extractGeneralDomain(uri) {
+    var url = uri.toLowerCase();
+    var urlParts = URLInfo.get(url);
+    var hostname = urlParts.hostname;
+    if (hostname.startsWith('www.')) {
+      hostname = hostname.substring(4);
+    }
+    return getGeneralDomain(hostname);
+  }
+
+  /* Wraps filter-based adblocking in a class. It has to handle both
+   * the management of lists (fetching, updating) using a FiltersLoader
+   * and the matching using a FilterEngine.
+   */
   return {
     setters: [function (_coreCliqz) {
       utils = _coreCliqz.utils;
@@ -251,13 +260,11 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
           value: function isDomainInBlacklist(url) {
             // Should all this domain stuff be extracted into a function?
             // Why is CliqzUtils.detDetailsFromUrl not used?
-            if (!utils.isUrl(url)) {
-              return false;
-            }
-            var urlParts = URLInfo.get(url);
-            var hostname = urlParts.hostname || url;
-            if (hostname.startsWith('www.')) {
-              hostname = hostname.substring(4);
+            var hostname = url;
+            try {
+              hostname = extractGeneralDomain(url);
+            } catch (e) {
+              // In case of ill-formed URL, just do a normal loopup
             }
 
             return this.blacklist.has(hostname);
@@ -284,14 +291,15 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
           value: function toggleUrl(url, domain) {
             var processedURL = url;
             if (domain) {
-              // Should all this domain stuff be extracted into a function?
-              // Why is CliqzUtils.getDetailsFromUrl not used?
-              if (utils.isUrl(processedURL)) {
-                processedURL = URLInfo.get(url).hostname;
+              try {
+                processedURL = extractGeneralDomain(processedURL);
+              } catch (e) {
+                // If there is no general domain to be extracted, it means the URL is
+                // not correct. Hence we can just ignore it. (eg: about:config).
+                return;
               }
-              if (processedURL.startsWith('www.')) {
-                processedURL = processedURL.substring(4);
-              }
+            } else {
+              processedURL = utils.cleanUrlProtocol(processedURL, true);
             }
 
             var existHW = CliqzHumanWeb && CliqzHumanWeb.state.v[url];
