@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		860373B81E043C1200749750 /* ContentPolicyDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B41E043C1200749750 /* ContentPolicyDetector.swift */; };
+		860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B51E043C1200749750 /* InterceptorURLProtocol.swift */; };
+		860373BA1E043C1200749750 /* WebRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B61E043C1200749750 /* WebRequest.swift */; };
 		8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8669E2371DFAE7D600B6D9F1 /* Crypto.swift */; };
 		B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041C51DF84EAB004F9E14 /* Engine.swift */; };
 		B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041CF1DF85071004F9E14 /* JSConsole.swift */; };
@@ -53,6 +56,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		860373B41E043C1200749750 /* ContentPolicyDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentPolicyDetector.swift; sourceTree = "<group>"; };
+		860373B51E043C1200749750 /* InterceptorURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterceptorURLProtocol.swift; sourceTree = "<group>"; };
+		860373B61E043C1200749750 /* WebRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebRequest.swift; sourceTree = "<group>"; };
 		8669E2371DFAE7D600B6D9F1 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
 		B30041C51DF84EAB004F9E14 /* Engine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		B30041CF1DF85071004F9E14 /* JSConsole.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSConsole.swift; sourceTree = "<group>"; };
@@ -218,6 +224,9 @@
 				8669E2371DFAE7D600B6D9F1 /* Crypto.swift */,
 				B30041CF1DF85071004F9E14 /* JSConsole.swift */,
 				B3429D2B1DFEA69000F27916 /* HttpHandler.swift */,
+				860373B61E043C1200749750 /* WebRequest.swift */,
+				860373B41E043C1200749750 /* ContentPolicyDetector.swift */,
+				860373B51E043C1200749750 /* InterceptorURLProtocol.swift */,
 				B3CEA5CD1DF6CA0000880EF8 /* Info.plist */,
 				B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */,
 			);
@@ -507,7 +516,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				860373B81E043C1200749750 /* ContentPolicyDetector.swift in Sources */,
 				B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */,
+				860373BA1E043C1200749750 /* WebRequest.swift in Sources */,
+				860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */,
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,
 				B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */,
 				8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */,
