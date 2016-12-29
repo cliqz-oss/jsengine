@@ -31,6 +31,7 @@ public class Engine {
     private final Set<Object> jsApis = new HashSet<>();
     final SystemLoader system;
     public final WebRequest webRequest;
+    private boolean mIsRunning = false;
 
     private static final String BUILD_PATH = "build";
 
@@ -48,15 +49,22 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
+    public boolean isRunning() {
+        return mIsRunning;
+    }
+
     public synchronized void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
-        try {
-            // load config
-            String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
-            jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
-            jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
-            system.callVoidFunctionOnModule("platform/startup", "startup");
-        } catch(IOException e) {
-            throw new ExecutionException(e);
+        if (!isRunning()) {
+            try {
+                // load config
+                String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
+                jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
+                jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
+                system.callVoidFunctionOnModule("platform/startup", "startup");
+                mIsRunning = true;
+            } catch (IOException e) {
+                throw new ExecutionException(e);
+            }
         }
     }
 
@@ -69,6 +77,7 @@ public class Engine {
             system.callVoidFunctionOnModule("platform/startup", "shutdown");
         } finally {
             jsengine.shutdown();
+            mIsRunning = false;
         }
     }
 
