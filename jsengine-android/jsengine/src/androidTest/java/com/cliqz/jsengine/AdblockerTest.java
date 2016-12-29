@@ -15,7 +15,6 @@ import com.eclipsesource.v8.utils.MemoryManager;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,7 +26,7 @@ import static org.junit.Assert.fail;
  * Created by sammacbeth on 05/12/2016.
  */
 
-@RunWith(AndroidJUnit4.class) @Ignore
+@RunWith(AndroidJUnit4.class)
 public class AdblockerTest {
 
     private Context appContext;
@@ -121,7 +120,7 @@ public class AdblockerTest {
             });
             if (!isBlocked) {
                 tryCtr++;
-                Thread.sleep(50);
+                Thread.sleep(200);
             }
         } while(!isBlocked && tryCtr < MAX_TRIES);
 

@@ -13,6 +13,8 @@ import com.eclipsesource.v8.V8ResultUndefined;
 import com.eclipsesource.v8.utils.MemoryManager;
 
 import org.json.JSONObject;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -27,9 +29,22 @@ import static org.junit.Assert.fail;
 
 @RunWith(AndroidJUnit4.class)
 public class AntiTrackingTest {
+
+    private Context appContext;
+
+    @Before
+    public void setUp() throws Exception {
+        appContext = InstrumentationRegistry.getTargetContext();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        // reset prefs
+        appContext.deleteFile("cliqz.prefs.json");
+    }
+
     @Test
     public void testBasicApi() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
         Engine extension = new Engine(appContext, true);
         AntiTracking attrack = new AntiTracking(extension);
         extension.startup(attrack.getDefaultPrefs());
@@ -41,7 +56,6 @@ public class AntiTrackingTest {
 
     @Test
     public void testWhitelisting() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
         Engine extension = new Engine(appContext, true);
         AntiTracking attrack = new AntiTracking(extension);
         extension.startup(attrack.getDefaultPrefs());
@@ -60,7 +74,6 @@ public class AntiTrackingTest {
     @Test
     public void testLoading() throws Exception {
         final int MAX_TRIES = 20;
-        Context appContext = InstrumentationRegistry.getTargetContext();
         Engine extension = new Engine(appContext, true);
         AntiTracking attrack = new AntiTracking(extension);
         extension.startup(attrack.getDefaultPrefs());
@@ -91,7 +104,7 @@ public class AntiTrackingTest {
             });
             if (!isReady) {
                 tryCtr++;
-                Thread.sleep(50);
+                Thread.sleep(200);
             }
         } while(!isReady && tryCtr < MAX_TRIES);
 
