@@ -38,6 +38,7 @@ public class AntiTracking {
         prefs.put(BLOOM_FILTER_PREF, true);
         prefs.put(ENABLE_PREF, true);
         prefs.put(QSBLOCKING_PREF, true);
+        prefs.put(FORCE_BLOCK_PREF, true);
         return prefs;
     }
 
