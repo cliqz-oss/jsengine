@@ -58,6 +58,9 @@ RUN mkdir /var/run/sshd && \
     sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     echo "export VISIBLE=now" >> /etc/profile
 
+# generate debug signing key
+RUN mkdir -p ~/.android && keytool -genkey -noprompt -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -dname "CN=cliqz.com"
+
 ENV NOTVISIBLE "in users profile"
 
 # Add entrypoint
