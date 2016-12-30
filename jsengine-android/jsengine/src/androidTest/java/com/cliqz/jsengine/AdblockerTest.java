@@ -120,7 +120,7 @@ public class AdblockerTest {
             });
             if (!isBlocked) {
                 tryCtr++;
-                Thread.sleep(50);
+                Thread.sleep(200);
             }
         } while(!isBlocked && tryCtr < MAX_TRIES);
 

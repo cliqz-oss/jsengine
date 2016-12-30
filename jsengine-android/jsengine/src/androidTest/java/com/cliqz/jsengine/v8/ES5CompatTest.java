@@ -1,6 +1,7 @@
 package com.cliqz.jsengine.v8;
 
 import org.json.JSONException;
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -11,7 +12,7 @@ import java.util.Collection;
  * Created by sammacbeth on 29/09/2016.
  */
 
-@RunWith(Parameterized.class)
+@RunWith(Parameterized.class) @Ignore
 public class ES5CompatTest extends ESCompatTest {
 
     @Parameterized.Parameters (name = "{0} :: {1}")
