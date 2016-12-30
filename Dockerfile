@@ -60,6 +60,7 @@ RUN mkdir /var/run/sshd && \
 
 # generate debug signing key
 RUN mkdir -p ~/.android && keytool -genkey -noprompt -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -dname "CN=cliqz.com"
+ENV _JAVA_OPTIONS=-Duser.home=./
 
 ENV NOTVISIBLE "in users profile"
 
