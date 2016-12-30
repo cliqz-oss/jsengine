@@ -44,7 +44,7 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # Install latest android tools and system images
 RUN ( sleep 4 && while [ 1 ]; do sleep 1; echo y; done ) | android update sdk --no-ui --force -a --filter \
-    platform-tools,android-24,android-25,build-tools-24.0.2,sys-img-x86-android-24,sys-img-armeabi-v7a-android-24 && \
+    platform-tools,android-24,android-25,build-tools-24.0.2,sys-img-x86-android-24,sys-img-armeabi-v7a-android-24,extra-android-m2repository && \
     echo "y" | android update adb
 
 # Create fake keymap file
