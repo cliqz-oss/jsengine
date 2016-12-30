@@ -1,6 +1,7 @@
 package com.cliqz.jsengine;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.JSConsole;
@@ -59,7 +60,7 @@ public class Engine {
                 // load config
                 String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
                 jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
-                jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse(" + new JSONObject(defaultPrefs).toString() + ");");
+                jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse('" + new JSONObject(defaultPrefs).toString() + "');");
                 system.callVoidFunctionOnModule("platform/startup", "startup");
                 mIsRunning = true;
             } catch (IOException e) {
