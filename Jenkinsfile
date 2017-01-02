@@ -11,7 +11,7 @@ node('ubuntu-docker-gpu') {
     docker.build(imageName)
   }
 
-  docker.image(imageName).inside('--privileged -v /dev/kvm:/dev/kvm -e "ANDROID_SDK_HOME=."') {
+  docker.image(imageName).inside('--privileged -v /dev/kvm:/dev/kvm') {
     stage('Compile') {
       // create signing key for build
       sh 'mkdir -p ./.android && cp /debug.keystore ./.android/'
@@ -19,10 +19,7 @@ node('ubuntu-docker-gpu') {
     }
 
     stage('Test') {
-      sh 'ls -la /usr/local/android-sdk/tools/'
-      sh 'echo "no" | android create avd -f -n test -t android-24 --abi default/x86'
-      sh 'android list avd'
-      sh 'emulator64-x86 -sysdir /.android/ -avd test -noaudio -no-window -verbose -qemu -enable-kvm -vnc :0'
+      sh 'emulator64-x86 -sysdir /.android/ -avd test_a24_x86 -noaudio -no-window -verbose -qemu -enable-kvm -vnc :0'
       sh './gradlew connectedDebugAndroidTest'
 
       step([
