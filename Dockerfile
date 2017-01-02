@@ -70,6 +70,12 @@ ENV NOTVISIBLE "in users profile"
 #ENV ANDROID_SDK_HOME $ANDROID_HOME
 #RUN echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test_a24_x86 -t android-24 --abi default/x86
 
+# Create Jenkins user
+ARG UID
+ARG GID
+RUN groupadd jenkins --gid $GID \
+&& useradd --create-home --shell /bin/bash jenkins --uid $UID --gid $GID
+
 ADD setup-kvm.sh /setup-kvm.sh
 RUN chmod +x /setup-kvm.sh
 CMD /setup-kvm.sh

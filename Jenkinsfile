@@ -8,7 +8,7 @@ node('ubuntu-docker-gpu') {
   }
 
   stage('Build docker image') {
-    docker.build(imageName)
+    docker.build(imageName, '--build-arg UID=1000 --build-arg GID=1000 .')
   }
 
   docker.image(imageName).inside('--privileged') {
