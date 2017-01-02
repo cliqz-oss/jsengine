@@ -22,13 +22,16 @@ node('ubuntu-docker-gpu') {
       sh 'echo "no" | android create avd -f -n test_a24_armeabi-v7a -t android-24 --abi default/armeabi-v7a'
       sh 'ANDROID_SDK_HOME=`pwd` emulator64-arm -avd test_a24_armeabi-v7a -noaudio -no-window -qemu &'
       sh '/bin/bash android-wait-for-emulator.sh'
-      sh './gradlew connectedDebugAndroidTest'
-
-      step([
-        $class: 'JUnitResultArchiver',
-        allowEmptyResults: false,
-        testResults: 'android-jsengine/build/test-results/debug/*.xml',
-      ])
+      try {
+        sh './gradlew connectedDebugAndroidTest'
+      } finally {
+        sh 'ls -la android-jsengine/build/test-results/'
+        step([
+          $class: 'JUnitResultArchiver',
+          allowEmptyResults: false,
+          testResults: 'android-jsengine/build/test-results/debug/*.xml',
+        ])
+      }
     }
   }
 }
