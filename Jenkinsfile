@@ -19,7 +19,8 @@ node('ubuntu-docker-gpu') {
     }
 
     stage('Test') {
-      sh 'emulator64-x86 -sysdir /.android/ -avd test_a24_x86 -noaudio -no-window -verbose -qemu -enable-kvm -vnc :0'
+      sh 'echo "no" | android create avd -f -n test_a24_x86 -t android-24 --abi default/x86'
+      sh 'ANDROID_SDK_HOME=`pwd` emulator64-x86 -avd test_a24_x86 -noaudio -no-window -verbose -qemu -enable-kvm -vnc :0'
       sh './gradlew connectedDebugAndroidTest'
 
       step([

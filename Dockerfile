@@ -68,8 +68,8 @@ ENV _JAVA_OPTIONS=-Duser.home=./
 ENV NOTVISIBLE "in users profile"
 
 # create test avd
-ENV ANDROID_SDK_HOME $ANDROID_HOME
-RUN echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test_a24_x86 -t android-24 --abi default/x86
+#ENV ANDROID_SDK_HOME $ANDROID_HOME
+#RUN echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test_a24_x86 -t android-24 --abi default/x86
 
 # Add entrypoint
 #ADD entrypoint.sh /entrypoint.sh
