@@ -36,6 +36,7 @@ RUN mkdir -p /usr/local/android-sdk && \
 
 # Add android tools and platform tools to PATH
 ENV ANDROID_HOME /usr/local/android-sdk
+ENV ANDROID_SDK_HOME $ANDROID_HOME
 ENV PATH $PATH:$ANDROID_HOME/tools
 ENV PATH $PATH:$ANDROID_HOME/platform-tools
 
@@ -58,6 +59,9 @@ RUN mkdir /var/run/sshd && \
     sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd && \
     echo "export VISIBLE=now" >> /etc/profile
 
+# make programs executable
+RUN chmod +x /usr/local/android-sdk/tools/android && chmod +x /usr/local/android-sdk/tools/emulator*
+
 # generate debug signing key
 RUN keytool -genkey -noprompt -keystore /debug.keystore -alias androiddebugkey -keyalg RSA -dname "CN=cliqz.com" -storepass 'android' -keypass 'android'
 ENV _JAVA_OPTIONS=-Duser.home=./
@@ -65,6 +69,6 @@ ENV _JAVA_OPTIONS=-Duser.home=./
 ENV NOTVISIBLE "in users profile"
 
 # Add entrypoint
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+#ADD entrypoint.sh /entrypoint.sh
+#RUN chmod +x /entrypoint.sh
+#ENTRYPOINT ["/entrypoint.sh"]
