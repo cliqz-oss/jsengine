@@ -19,8 +19,8 @@ node('ubuntu-docker-gpu') {
     }
 
     stage('Test') {
-      sh 'echo "no" | android create avd -f -n test_a24_x86 -t android-24 --abi default/x86'
-      sh 'ANDROID_SDK_HOME=`pwd` emulator64-x86 -avd test_a24_x86 -noaudio -no-window -verbose -qemu -enable-kvm -vnc :0'
+      sh 'echo "no" | android create avd -f -n test_a24_armeabi-v7a -t android-24 --abi default/armeabi-v7a'
+      sh 'ANDROID_SDK_HOME=`pwd` emulator64-arm -avd test_a24_armeabi-v7a -noaudio -no-window -verbose -qemu -vnc :0'
       sh './gradlew connectedDebugAndroidTest'
 
       step([
