@@ -1,5 +1,5 @@
 # Android development environment for ubuntu.
-# version 0.0.5
+# Adapted from tracer0tong/android-emulator by tracer0tong <yuriy.leonychev@gmail.com>
 
 FROM ubuntu:16.04
 
@@ -66,21 +66,8 @@ ENV _JAVA_OPTIONS=-Duser.home=./
 
 ENV NOTVISIBLE "in users profile"
 
-# create test avd
-#ENV ANDROID_SDK_HOME $ANDROID_HOME
-#RUN echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test_a24_x86 -t android-24 --abi default/x86
-
 # Create Jenkins user
 ARG UID
 ARG GID
 RUN groupadd jenkins --gid $GID \
 && useradd --create-home --shell /bin/bash jenkins --uid $UID --gid $GID
-
-ADD setup-kvm.sh /setup-kvm.sh
-RUN chmod +x /setup-kvm.sh
-CMD /setup-kvm.sh
-
-# Add entrypoint
-#ADD entrypoint.sh /entrypoint.sh
-#RUN chmod +x /entrypoint.sh
-#ENTRYPOINT ["/entrypoint.sh"]
