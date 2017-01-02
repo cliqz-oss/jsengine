@@ -17,8 +17,6 @@ node('ubuntu-docker-gpu') {
     }
 
     stage('Test') {
-      sh 'pwd'
-      sh 'ls -la `pwd`/.android/'
       sh './gradlew connectedDebugAndroidTest'
 
       step([

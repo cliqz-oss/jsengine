@@ -30,7 +30,8 @@ then
     EMU="x86"
 else
     EMU="arm"
-fiand
+fi
 
 echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test -t ${EMULATOR} --abi default/${ARCH}
 echo "no" | /usr/local/android-sdk/tools/emulator64-${EMU} -avd test -noaudio -no-window -gpu off -verbose -qemu -usbdevice tablet -vnc :0
+echo "Emulator started"
