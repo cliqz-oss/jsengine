@@ -3,7 +3,6 @@
 
 FROM ubuntu:16.04
 
-MAINTAINER tracer0tong <yuriy.leonychev@gmail.com>
 MAINTAINER sam-cliqz <sam@cliqz.com>
 
 # Specially for SSH access and port redirection
@@ -70,6 +69,10 @@ ENV NOTVISIBLE "in users profile"
 # create test avd
 #ENV ANDROID_SDK_HOME $ANDROID_HOME
 #RUN echo "no" | /usr/local/android-sdk/tools/android create avd -f -n test_a24_x86 -t android-24 --abi default/x86
+
+ADD setup-kvm.sh /setup-kvm.sh
+RUN chmod +x /setup-kvm.sh
+CMD /setup-kvm.sh
 
 # Add entrypoint
 #ADD entrypoint.sh /entrypoint.sh
