@@ -13,6 +13,8 @@ node('ubuntu-docker-gpu') {
 
   docker.image(imageName).inside('--privileged -v /dev/kvm:/dev/kvm -e "EMULATOR=android-24" -e "ARCH=x86"') {
     stage('Compile') {
+      // create signing key for build
+      sh 'mkdir -p ./.android && cp /debug.keystore ./.android/'
       sh './gradlew assembleDebug'
     }
 

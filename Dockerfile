@@ -59,7 +59,7 @@ RUN mkdir /var/run/sshd && \
     echo "export VISIBLE=now" >> /etc/profile
 
 # generate debug signing key
-RUN mkdir -p ~/.android && keytool -genkey -noprompt -keystore ~/.android/debug.keystore -alias androiddebugkey -keyalg RSA -dname "CN=cliqz.com"
+RUN keytool -genkey -noprompt -keystore /debug.keystore -alias androiddebugkey -keyalg RSA -dname "CN=cliqz.com" -storepass 'android' -keypass 'android'
 ENV _JAVA_OPTIONS=-Duser.home=./
 
 ENV NOTVISIBLE "in users profile"
