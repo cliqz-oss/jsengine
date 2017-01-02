@@ -36,7 +36,6 @@ RUN mkdir -p /usr/local/android-sdk && \
 
 # Add android tools and platform tools to PATH
 ENV ANDROID_HOME /usr/local/android-sdk
-ENV ANDROID_SDK_HOME $ANDROID_HOME
 ENV PATH $PATH:$ANDROID_HOME/tools
 ENV PATH $PATH:$ANDROID_HOME/platform-tools
 
