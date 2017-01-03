@@ -33,10 +33,24 @@ public class Adblocker {
         this.engine = engine;
     }
 
+    /**
+     * Get default prefences to load the adblock module in a disabled state
+     * @return
+     */
     public static Map<String, Object> getDefaultPrefs() {
+        return getDefaultPrefs(false);
+    }
+
+    /**
+     * Get the default preferences to load the adblock module in the state given by enabled
+     * @param enabled
+     * @return
+     */
+    public static Map<String, Object> getDefaultPrefs(final boolean enabled) {
         final Map<String, Object> prefs = new HashMap<>();
         prefs.put(ABTEST_PREF, true);
         prefs.put(ENABLE_PREF, 1);
+        prefs.put("modules."+ MODULE_NAME + ".enabled", enabled);
         return prefs;
     }
 
