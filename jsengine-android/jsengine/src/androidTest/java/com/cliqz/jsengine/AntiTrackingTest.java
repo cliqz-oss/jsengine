@@ -40,6 +40,7 @@ public class AntiTrackingTest {
     public void setUp() throws Exception {
         appContext = InstrumentationRegistry.getTargetContext();
         extension = new Engine(appContext, true);
+
         attrack = new AntiTracking(extension);
         Map<String, Object> defaultPrefs = AntiTracking.getDefaultPrefs(true);
         defaultPrefs.putAll(Adblocker.getDefaultPrefs(false));
@@ -48,7 +49,7 @@ public class AntiTrackingTest {
 
     @After
     public void tearDown() throws Exception {
-        extension.shutdown();
+        extension.shutdown(true);
         // reset prefs
         appContext.deleteFile("cliqz.prefs.json");
     }

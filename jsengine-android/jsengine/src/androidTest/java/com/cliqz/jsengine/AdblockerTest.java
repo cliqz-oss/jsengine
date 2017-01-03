@@ -48,8 +48,8 @@ public class AdblockerTest {
 
     @After
     public void tearDown() throws Exception {
-        // shutdown commented because Adblocker currently leaks 2 objects on shutdown
-        //extension.shutdown();
+        // non strict shutdown because of adblocker memory leaks.
+        extension.shutdown(false);
         // reset prefs
         appContext.deleteFile("cliqz.prefs.json");
     }
