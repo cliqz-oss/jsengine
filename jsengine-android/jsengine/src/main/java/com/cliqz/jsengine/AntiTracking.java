@@ -33,7 +33,7 @@ public class AntiTracking {
         this.webRequest = engine.webRequest;
     }
 
-    public Map<String, Object> getDefaultPrefs() {
+    public static Map<String, Object> getDefaultPrefs() {
         final Map<String, Object> prefs = new HashMap<>();
         prefs.put(BLOOM_FILTER_PREF, true);
         prefs.put(ENABLE_PREF, true);
