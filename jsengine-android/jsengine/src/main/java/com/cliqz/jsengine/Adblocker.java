@@ -33,7 +33,7 @@ public class Adblocker {
         this.engine = engine;
     }
 
-    public Map<String, Object> getDefaultPrefs() {
+    public static Map<String, Object> getDefaultPrefs() {
         final Map<String, Object> prefs = new HashMap<>();
         prefs.put(ABTEST_PREF, true);
         prefs.put(ENABLE_PREF, 1);
