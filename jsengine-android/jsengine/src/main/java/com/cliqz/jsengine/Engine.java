@@ -33,6 +33,7 @@ public class Engine {
     final SystemLoader system;
     public final WebRequest webRequest;
     private boolean mIsRunning = false;
+    boolean debugMode = false;
 
     private static final String BUILD_PATH = "build";
 
@@ -74,10 +75,14 @@ public class Engine {
     }
 
     public void shutdown() throws ExecutionException {
+        shutdown(false);
+    }
+
+    public void shutdown(boolean strict) throws ExecutionException {
         try {
             system.callVoidFunctionOnModule("platform/startup", "shutdown");
         } finally {
-            jsengine.shutdown();
+            jsengine.shutdown(strict);
             mIsRunning = false;
         }
     }

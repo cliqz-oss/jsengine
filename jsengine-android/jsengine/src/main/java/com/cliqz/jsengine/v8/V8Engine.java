@@ -30,6 +30,7 @@ public class V8Engine implements JSEngine {
     private final List<Query> shutdownHooks = new LinkedList<>();
 
     private boolean shutdown = false;
+    boolean suppressShutdownCrash = true;
 
     public V8Engine() {
         v8Thread = new Thread(new Runnable() {
@@ -46,7 +47,14 @@ public class V8Engine implements JSEngine {
                         Log.e(TAG, "Task timeout", e);
                     }
                 }
-                v8.release();
+                try {
+                    v8.release();
+                } catch(IllegalStateException e) {
+                    // caused by memory leak on shutdown
+                    if (!suppressShutdownCrash) {
+                        throw e;
+                    }
+                }
             }
         });
         v8Thread.start();
@@ -57,6 +65,12 @@ public class V8Engine implements JSEngine {
     }
 
     public void shutdown() {
+        shutdown(false);
+    }
+
+    public void shutdown(boolean strict) {
+        // for a strict shutdown we crash if memory was leaked
+        suppressShutdownCrash = !strict;
         // release JS engine resources and shutdown executor thread.
         Log.w(TAG, "V8 shutdown");
         for(Query q : shutdownHooks) {
