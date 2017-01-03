@@ -18,6 +18,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -30,35 +32,35 @@ import static org.junit.Assert.fail;
 public class AdblockerTest {
 
     private Context appContext;
+    private Engine extension;
+    private Adblocker adb;
 
     @Before
     public void setUp() throws Exception {
         appContext = InstrumentationRegistry.getTargetContext();
+        extension = new Engine(appContext, true);
+        adb = new Adblocker(extension);
+        Map<String, Object> defaultPrefs = Adblocker.getDefaultPrefs(true);
+        defaultPrefs.putAll(AntiTracking.getDefaultPrefs(false));
+        extension.startup(defaultPrefs);
+        extension.setLoggingEnabled(true);
     }
 
     @After
     public void tearDown() throws Exception {
+        // shutdown commented because Adblocker currently leaks 2 objects on shutdown
+        //extension.shutdown();
         // reset prefs
         appContext.deleteFile("cliqz.prefs.json");
     }
 
     @Test
     public void testBasicApi() throws Exception {
-        Engine extension = new Engine(appContext, true);
-        Adblocker adb = new Adblocker(extension);
-        extension.startup(adb.getDefaultPrefs());
-        adb.setEnabled(true);
-        //extension.shutdown();
+
     }
 
     @Test
     public void testBlackListing() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        Engine extension = new Engine(appContext, true);
-        Adblocker adb = new Adblocker(extension);
-        extension.startup(adb.getDefaultPrefs());
-        extension.setLoggingEnabled(true);
-        adb.setEnabled(true);
 
         extension.jsengine.queryEngine(new V8Engine.Query<Object>() {
             @Override
@@ -80,11 +82,7 @@ public class AdblockerTest {
     @Test
     public void testListLoading() throws Exception {
         final int MAX_TRIES = 20;
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        final Engine extension = new Engine(appContext, false);
-        Adblocker adb = new Adblocker(extension);
-        extension.startup(adb.getDefaultPrefs());
-        adb.setEnabled(true);
+
         final V8Object requestDetails = extension.jsengine.queryEngine(new V8Engine.Query<V8Object>() {
             @Override
             public V8Object query(V8 runtime) {
