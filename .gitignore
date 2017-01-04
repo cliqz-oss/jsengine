@@ -2,4 +2,4 @@
 .gradle/
 /build/*
 *.iml
-
+node_modules/
