@@ -11,8 +11,25 @@ import {
   Text,
   View
 } from 'react-native';
+import { NativeModules } from 'react-native';
+const history = NativeModules.History;
 
 export default class ConversationUI extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      history: [],
+    }
+  }
+
+  componentDidMount() {
+    history.getHistoryItems(0, 10).then(items => {
+      this.setState({history: items})
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -20,7 +37,9 @@ export default class ConversationUI extends Component {
           Welcome to CLIQZ Mobile Native!!!!!
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit index.android.js
+          {this.state.history.map(item => 
+            <Text>{item.url}</Text>
+          )}
         </Text>
         <Text style={styles.instructions}>
           Double tap R on your keyboard to reload,{'\n'}
