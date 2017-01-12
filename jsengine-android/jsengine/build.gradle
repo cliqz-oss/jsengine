@@ -1,3 +1,4 @@
+apply from: "/Users/sammacbeth/work/mobile-extension/node_modules/react-native/react.gradle"
 apply plugin: 'com.android.library'
 
 android {
@@ -30,4 +31,16 @@ dependencies {
 
     androidTestCompile "com.eclipsesource.j2v8:j2v8:4.6.0@aar"
     compile "com.eclipsesource.j2v8:j2v8:4.6.0@aar"
+
+    compile "com.facebook.react:react-native:+" // From node_modules.
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {  // All of React Native (JS, Android binaries) is installed from npm
+//            url "../../node_modules/react-native/android"
+            url "/Users/sammacbeth/work/mobile-extension/node_modules/react-native/android"
+        }
+    }
 }
