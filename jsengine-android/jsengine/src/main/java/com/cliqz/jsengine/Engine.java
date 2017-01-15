@@ -1,7 +1,6 @@
 package com.cliqz.jsengine;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.cliqz.jsengine.v8.JSApiException;
 import com.cliqz.jsengine.v8.JSConsole;
@@ -13,16 +12,18 @@ import com.cliqz.jsengine.v8.api.FileIO;
 import com.cliqz.jsengine.v8.api.HttpRequestPolicy;
 import com.cliqz.jsengine.v8.api.SystemLoader;
 import com.cliqz.jsengine.v8.api.WebRequest;
-import com.eclipsesource.v8.utils.MemoryManager;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Engine {
 
@@ -32,13 +33,14 @@ public class Engine {
     private final Set<Object> jsApis = new HashSet<>();
     final SystemLoader system;
     public final WebRequest webRequest;
-    private boolean mIsRunning = false;
-    boolean debugMode = false;
+    private volatile boolean mIsRunning = false;
+    private final ExecutorService service;
 
     private static final String BUILD_PATH = "build";
 
     public Engine(final Context context, final boolean mobileDataEnabled) throws JSApiException {
         this.context = context.getApplicationContext();
+        this.service = Executors.newSingleThreadExecutor();
         jsengine = new V8Engine();
         // load js APIs
         jsApis.add(new Timers(jsengine));
@@ -51,23 +53,28 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
-    public boolean isRunning() {
-        return mIsRunning;
-    }
-
-    public synchronized void startup(Map<String, Object> defaultPrefs) throws ExecutionException {
-        if (!isRunning()) {
-            try {
-                // load config
-                String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
-                jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
-                jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse('" + new JSONObject(defaultPrefs).toString() + "');");
-                system.callVoidFunctionOnModule("platform/startup", "startup");
-                mIsRunning = true;
-            } catch (IOException e) {
-                throw new ExecutionException(e);
+    public void startup(final Map<String, Object> prefs) throws ExecutionException {
+        synchronized (this) {
+            if (mIsRunning) {
+                return;
             }
+            mIsRunning = true;
         }
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // load config
+                    String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
+                    jsengine.executeScript("var __CONFIG__ = JSON.parse(\"" + config.replace("\"", "\\\"").replace("\n", "") + "\");");
+                    jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse('" + new JSONObject(prefs).toString() + "');");
+                    system.callVoidFunctionOnModule("platform/startup", "startup");
+                    mIsRunning = true;
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public void startup() throws ExecutionException {
@@ -79,20 +86,45 @@ public class Engine {
     }
 
     public void shutdown(boolean strict) throws ExecutionException {
-        try {
-            system.callVoidFunctionOnModule("platform/startup", "shutdown");
-        } finally {
-            jsengine.shutdown(strict);
-            mIsRunning = false;
+        synchronized (this) {
+            if (!mIsRunning) {
+                return;
+            }
+            try {
+                system.callVoidFunctionOnModule("platform/startup", "shutdown");
+            } finally {
+                jsengine.shutdown(strict);
+                service.shutdownNow();
+                mIsRunning = false;
+            }
         }
     }
 
-    public synchronized void setPref(final String prefName, final Object value) throws ExecutionException {
-        system.callVoidFunctionOnModuleAttribute("core/utils", new String[] {"default"}, "setPref", prefName, value);
+    public void setPref(final String prefName, final Object value) {
+        service.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    system.callVoidFunctionOnModuleAttribute("core/utils", new String[] {"default"}, "setPref", prefName, value);
+                } catch (ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
-    public synchronized Object getPref(String prefName) throws ExecutionException {
-        return system.callFunctionOnModuleDefault("core/utils", "getPref");
+    public Object getPref(final String prefName) {
+        final Future<Object> future = service.submit(new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                return system.callFunctionOnModuleDefault("core/utils", "getPref", prefName);
+            }
+        });
+        try {
+            return future.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setLoggingEnabled(boolean enabled) throws ExecutionException {
