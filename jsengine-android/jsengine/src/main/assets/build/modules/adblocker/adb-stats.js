@@ -1,8 +1,7 @@
-System.register('adblocker/adb-stats', ['antitracking/domain', 'adblocker/adblocker', 'antitracking/url'], function (_export) {
-  // import attrack from 'antitracking/attrack';
+System.register('adblocker/adb-stats', ['antitracking/domain', 'adblocker/adblocker', 'antitracking/url', 'core/domain-info'], function (_export) {
   'use strict';
 
-  var getGeneralDomain, CliqzADB, URLInfo, attrack, PageStats, AdbStats;
+  var getGeneralDomain, CliqzADB, URLInfo, domainInfo, PageStats, AdbStats;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -17,12 +16,10 @@ System.register('adblocker/adb-stats', ['antitracking/domain', 'adblocker/adbloc
       CliqzADB = _adblockerAdblocker['default'];
     }, function (_antitrackingUrl) {
       URLInfo = _antitrackingUrl.URLInfo;
+    }, function (_coreDomainInfo) {
+      domainInfo = _coreDomainInfo['default'];
     }],
     execute: function () {
-      attrack = {
-        tracker_companies: {}
-      };
-
       PageStats = (function () {
         function PageStats(url) {
           _classCallCheck(this, PageStats);
@@ -40,12 +37,12 @@ System.register('adblocker/adb-stats', ['antitracking/domain', 'adblocker/adbloc
             var company = undefined;
             // Re-use anti tracking company list for the moment.
             // TODO: Replace it with a proper ads company list later
-            if (domain in attrack.tracker_companies) {
-              company = attrack.tracker_companies[domain];
+            if (domain in domainInfo.domainOwners) {
+              company = domainInfo.domainOwners[domain];
             } else if (domain === getGeneralDomain(URLInfo.get(this.pageUrl).hostname)) {
               company = 'First party';
             } else {
-              company = '_Unknown';
+              company = domain;
             }
             if (this.blocked.get(company)) {
               if (!this.blocked.get(company).has(url)) {

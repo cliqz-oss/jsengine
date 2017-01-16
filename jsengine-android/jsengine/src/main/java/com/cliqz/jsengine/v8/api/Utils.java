@@ -18,12 +18,13 @@ class Utils {
         try {
             stream = context.getAssets().open(assetPath);
             BufferedReader srcReader = new BufferedReader(new InputStreamReader(stream));
-            String script = "";
+            StringBuilder script = new StringBuilder();
             String line;
             while ((line = srcReader.readLine()) != null) {
-                script += line + "\n";
+                script.append(line);
+                script.append("\n");
             }
-            return script;
+            return script.toString();
         }  finally {
             try {
                 if (stream != null) {

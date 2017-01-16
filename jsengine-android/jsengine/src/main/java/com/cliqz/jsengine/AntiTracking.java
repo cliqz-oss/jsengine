@@ -33,11 +33,25 @@ public class AntiTracking {
         this.webRequest = engine.webRequest;
     }
 
-    public Map<String, Object> getDefaultPrefs() {
+    /**
+     * Get the default prefs to initialise the antitracking module in enabled state
+     * @return
+     */
+    public static Map<String, Object> getDefaultPrefs() {
+        return getDefaultPrefs(true);
+    }
+
+    /**
+     * Get the default prefs to initialise the antitracking module
+     * @param enabled
+     * @return
+     */
+    public static Map<String, Object> getDefaultPrefs(final boolean enabled) {
         final Map<String, Object> prefs = new HashMap<>();
         prefs.put(BLOOM_FILTER_PREF, true);
-        prefs.put(ENABLE_PREF, true);
+        prefs.put(ENABLE_PREF, enabled);
         prefs.put(QSBLOCKING_PREF, true);
+        prefs.put(FORCE_BLOCK_PREF, true);
         return prefs;
     }
 

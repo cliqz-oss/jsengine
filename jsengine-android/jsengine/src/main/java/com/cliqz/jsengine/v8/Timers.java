@@ -1,12 +1,16 @@
 package com.cliqz.jsengine.v8;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
 import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Function;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -74,14 +78,15 @@ public class Timers {
             public Object query(V8 runtime) {
                 Log.d(TAG, "Timers shutdown");
                 deferredFnExecutor.shutdown();
+
                 // clear intervals
-                for(int id : intervals.keySet()) {
-                    intervals.get(id).first.release();
+                for(int id : new HashSet<Integer>(intervals.keySet())) {
+                    clearInterval(id);
                 }
                 intervals.clear();
                 // clear timeouts
-                for(int id : timeouts.keySet()) {
-                    timeouts.get(id).first.release();
+                for(int id : new HashSet<Integer>(timeouts.keySet())) {
+                    clearTimeout(id);
                 }
                 timeouts.clear();
                 return null;
@@ -110,7 +115,19 @@ public class Timers {
                             return null;
                         }
                     });
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                } catch (InterruptedException e) {
+                    // if interupted, maybe sure the callback is released
+                    try {
+                        runtime.queryEngine(new V8Engine.Query<Object>() {
+                            @Override
+                            public Object query(V8 runtime) {
+                                if (!callback.isReleased())
+                                    callback.release();
+                                return null;
+                            }
+                        });
+                    } catch(InterruptedException | ExecutionException | TimeoutException e2) {}
+                } catch (ExecutionException | TimeoutException e) {
                     Log.e(TAG, "Exception in setTimeout", e);
                 }
             }
@@ -130,12 +147,11 @@ public class Timers {
             V8Function callback = timer.first;
             ScheduledFuture future = timer.second;
 
-            if (!future.isDone() && !future.isCancelled()) {
-                future.cancel(false);
-            }
+            future.cancel(true);
 
             timeouts.remove(timerId);
-            callback.release();
+            if (!callback.isReleased())
+                callback.release();
         }
     }
 
@@ -159,7 +175,20 @@ public class Timers {
                             return null;
                         }
                     });
-                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                } catch (InterruptedException e) {
+                    // if interupted, maybe sure the callback is released
+                    try {
+                        runtime.queryEngine(new V8Engine.Query<Object>() {
+                            @Override
+                            public Object query(V8 runtime) {
+                                if (!callback.isReleased())
+                                    callback.release();
+                                return null;
+                            }
+                        });
+                    } catch(InterruptedException | ExecutionException | TimeoutException e2) {}
+                }
+                catch (ExecutionException | TimeoutException e) {
                     Log.e(TAG, "Exception in setInterval", e);
                 }
             }
@@ -179,12 +208,11 @@ public class Timers {
             V8Function callback = timer.first;
             ScheduledFuture future = timer.second;
 
-            if (!future.isDone() && !future.isCancelled()) {
-                future.cancel(false);
-            }
+            future.cancel(true);
 
             intervals.remove(timerId);
-            callback.release();
+            if (!callback.isReleased())
+                callback.release();
         }
     }
 
