@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 public class Engine {
 
@@ -37,6 +38,8 @@ public class Engine {
     private final ExecutorService service;
 
     private static final String BUILD_PATH = "build";
+
+    private Future<Boolean> mIsStarted = null;
 
     public Engine(final Context context, final boolean mobileDataEnabled) throws JSApiException {
         this.context = context.getApplicationContext();
@@ -60,9 +63,9 @@ public class Engine {
             }
             mIsRunning = true;
         }
-        service.submit(new Runnable() {
+        mIsStarted = service.submit(new Callable<Boolean>() {
             @Override
-            public void run() {
+            public Boolean call() throws Exception {
                 try {
                     // load config
                     String config = system.readSourceFile(BUILD_PATH + "/config/cliqz.json");
@@ -70,6 +73,7 @@ public class Engine {
                     jsengine.executeScript("var __DEFAULTPREFS__ = JSON.parse('" + new JSONObject(prefs).toString() + "');");
                     system.callVoidFunctionOnModule("platform/startup", "startup");
                     mIsRunning = true;
+                    return true;
                 } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
@@ -87,11 +91,16 @@ public class Engine {
 
     public void shutdown(boolean strict) throws ExecutionException {
         synchronized (this) {
-            if (!mIsRunning) {
+            if (!mIsRunning || mIsStarted == null) {
                 return;
             }
             try {
-                system.callVoidFunctionOnModule("platform/startup", "shutdown");
+                // check that startup has completed before calling shutdown
+                if (mIsStarted.get()) {
+                    system.callVoidFunctionOnModule("platform/startup", "shutdown");
+                }
+            } catch (InterruptedException e) {
+                throw new ExecutionException(e);
             } finally {
                 jsengine.shutdown(strict);
                 service.shutdownNow();

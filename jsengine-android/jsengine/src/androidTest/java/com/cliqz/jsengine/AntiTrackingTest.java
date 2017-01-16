@@ -44,7 +44,9 @@ public class AntiTrackingTest {
         attrack = new AntiTracking(extension);
         Map<String, Object> defaultPrefs = AntiTracking.getDefaultPrefs(true);
         defaultPrefs.putAll(Adblocker.getDefaultPrefs(false));
+        defaultPrefs.putAll(Engine.getDebugPrefs());
         extension.startup(defaultPrefs);
+        extension.getPref("test");
     }
 
     @After

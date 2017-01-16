@@ -29,7 +29,6 @@ public class EngineTest {
     public void setUp() throws Exception {
         appContext = InstrumentationRegistry.getTargetContext();
         extension = new Engine(appContext, true);
-        extension.startup();
     }
 
     @After
