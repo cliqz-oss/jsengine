@@ -46,10 +46,20 @@ class WebRequest {
         tabs.setObject(webView, forKey: NSNumber(integer: tabId))
     }
     
-    //MARK: - Private Methods
-    private func isTabActive(tabId: Int) -> Bool {
+    func getUrlForTab(tabId: Int) -> String? {
+        if self.isTabActive(tabId) {
+            if let webView = tabs.objectForKey(tabId) as? UIWebView {
+                return webView.request?.URL?.absoluteString
+            }
+        }
+        return nil
+    }
+    
+    func isTabActive(tabId: Int) -> Bool {
         return tabs.objectForKey(tabId) != nil
     }
+    
+    //MARK: - Private Methods
     
     private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
         
