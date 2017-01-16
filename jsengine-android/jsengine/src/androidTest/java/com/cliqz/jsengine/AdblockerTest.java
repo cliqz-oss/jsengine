@@ -42,8 +42,9 @@ public class AdblockerTest {
         adb = new Adblocker(extension);
         Map<String, Object> defaultPrefs = Adblocker.getDefaultPrefs(true);
         defaultPrefs.putAll(AntiTracking.getDefaultPrefs(false));
+        defaultPrefs.putAll(Engine.getDebugPrefs());
         extension.startup(defaultPrefs);
-        extension.setLoggingEnabled(true);
+        extension.getPref("test");
     }
 
     @After
