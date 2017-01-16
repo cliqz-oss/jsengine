@@ -69,12 +69,12 @@ class SystemLoader {
         module.invokeMethod(functionName, withArguments: arguments)
     }
     
-    func callFunctionOnModule(modulePath: String, functionName: String, arguments: [AnyObject]? = nil) throws -> AnyObject? {
+    func callFunctionOnModule(modulePath: String, functionName: String, arguments: [AnyObject]? = nil) throws -> JSValue? {
         let module = try loadModule(modulePath)
         return try callFunctionOnObject(module, functionName: functionName, arguments: arguments)
     }
     
-    func callFunctionOnModuleAttribute(modulePath: String, attribute: [String], functionName: String, arguments: [AnyObject]? = nil) throws -> AnyObject? {
+    func callFunctionOnModuleAttribute(modulePath: String, attribute: [String], functionName: String, arguments: [AnyObject]? = nil) throws -> JSValue? {
         let depth = attribute.count
         var attributeStack = [JSValue?](count:depth+1, repeatedValue: nil)
         
@@ -87,14 +87,10 @@ class SystemLoader {
         return try callFunctionOnObject(attributeStack[depth]!, functionName: functionName, arguments: arguments)
     }
     
-    private func callFunctionOnObject(obj: AnyObject, functionName: String, arguments: [AnyObject]? = nil) throws -> AnyObject? {
+    private func callFunctionOnObject(obj: AnyObject, functionName: String, arguments: [AnyObject]? = nil) throws -> JSValue? {
         let fnResult = obj.invokeMethod(functionName, withArguments: arguments)
         
-        if fnResult.isUndefined {
-            return nil
-        } else {
-            return fnResult.toObject()
-        }
+        return fnResult
     }
     
     private func loadModuleInternal(moduleName: String) throws -> JSValue {

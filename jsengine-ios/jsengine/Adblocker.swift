@@ -1,0 +1,71 @@
+//
+//  Adblocker.swift
+//  jsengine
+//
+//  Created by Ghadir Eraisha on 1/16/17.
+//  Copyright © 2017 Cliqz GmbH. All rights reserved.
+//
+
+import Foundation
+
+class Adblocker {
+    
+    //MARK: - Constants
+    private static let moduleName = "adblocker"
+    private static let enablePref = "cliqz-adb"
+    private static let abTestPref = "cliqz-adb-abtest"
+    
+    //MARK: - Instant variables
+    var engine: Engine
+    
+    //MARK: - Init
+    public init(engine: Engine) {
+        self.engine = engine
+    }
+    
+    //MARK: - Public APIs
+    class func getDefaultPrefs(enabled: Bool? = true) -> [String: AnyObject] {
+        var prefs: [String:AnyObject] = [String:AnyObject]()
+        prefs[Adblocker.enablePref] = 1
+        prefs[Adblocker.abTestPref] = true
+        prefs["modules." + Adblocker.moduleName + ".enabled"] = enabled
+        
+        return prefs
+    }
+    
+    func setEnabled(enabled: Bool) throws {
+        try self.engine.setPref(Adblocker.abTestPref, prefValue: true)
+        try self.engine.setPref(Adblocker.enablePref, prefValue: enabled ? 1 : 0)
+        try self.engine.setPref("modules." + Adblocker.moduleName + ".enabled", prefValue: enabled)
+    }
+    
+    func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
+        do {
+            let stats = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adbStats"], functionName: "report", arguments: [url])
+            return stats?.toDictionary()
+        } catch let error as NSError {
+            DebugLogger.log("<< Error in Adblocker.getAdBlockingInfo: \(error)")
+        }
+        return nil
+    }
+    
+    func isBlacklisted(url: String) -> Bool {
+        do {
+            let blacklisted = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "isDomainInBlacklist", arguments: [url])
+            if let blacklisted =  blacklisted {
+                return blacklisted.toBool()
+            }
+        } catch let error as NSError {
+            DebugLogger.log("<< Error in Adblocker.isBlacklisted: \(error)")
+        }
+        return false
+    }
+    
+    func toggleUrl(url: String, domain: Bool) {
+        do {
+            try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
+        } catch let error as NSError {
+            DebugLogger.log("<< Error in Adblocker.toggleUrl: \(error)")
+        }
+    }
+}
