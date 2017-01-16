@@ -56,6 +56,12 @@ public class Engine {
         jsApis.add(new ChromeUrlHandler(jsengine, policy, system));
     }
 
+    public static Map<String, Object> getDebugPrefs() {
+        Map<String, Object> prefs = new HashMap<>();
+        prefs.put("showConsoleLogs", true);
+        return prefs;
+    }
+
     public void startup(final Map<String, Object> prefs) throws ExecutionException {
         synchronized (this) {
             if (mIsRunning) {
