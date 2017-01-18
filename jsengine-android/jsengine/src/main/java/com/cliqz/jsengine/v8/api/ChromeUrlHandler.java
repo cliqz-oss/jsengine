@@ -44,12 +44,16 @@ public class ChromeUrlHandler extends HttpHandler {
                                final V8Function callback, final V8Function onerror) {
         if (!requestedUrl.startsWith("file://") && !requestedUrl.startsWith("chrome://")) {
             doErrorCallback(callback, onerror);
+            callback.release();
+            onerror.release();
             return false;
         }
 
         // keep a handle on the callbacks
         final V8Function successCallback = (V8Function) callback.twin();
         final V8Function errorCallback = (V8Function) onerror.twin();
+        callback.release();
+        onerror.release();
 
         engine.getWorker().submit(new Runnable() {
             @Override
@@ -59,9 +63,11 @@ public class ChromeUrlHandler extends HttpHandler {
                     final String fileContents = system.readSourceFile(assetPath);
                     final HttpResponse resp = new HttpResponse(200, fileContents);
                     doHandlerCallback(resp, successCallback, errorCallback);
-                } catch(IOException e) {
+                } catch(Exception e) {
                     Log.e(TAG, "Could not load chrome url: "+ requestedUrl, e);
                     doErrorCallback(successCallback, errorCallback);
+                } finally {
+                    releaseObjects(successCallback, errorCallback);
                 }
             }
         });

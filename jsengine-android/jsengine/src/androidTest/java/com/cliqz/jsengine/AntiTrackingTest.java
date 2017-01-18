@@ -47,6 +47,7 @@ public class AntiTrackingTest {
         defaultPrefs.putAll(Engine.getDebugPrefs());
         extension.startup(defaultPrefs);
         extension.getPref("test");
+        Thread.sleep(50);
     }
 
     @After
