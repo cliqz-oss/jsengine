@@ -72,10 +72,12 @@ public class Adblocker {
 
     public boolean isBlacklisted(final String url) {
         try {
-            final Object blacklisted = engine.system.callFunctionOnModuleAttribute(MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "isDomainInBlacklist", url);
+            final Object blacklisted = engine.system.callFunctionOnModuleAttribute(50, MODULE_NAME +"/adblocker", new String[]{"default", "adBlocker"}, "isDomainInBlacklist", url);
             return blacklisted.equals(Boolean.TRUE);
         } catch(ExecutionException e) {
 //            Log.e(TAG, "isBlacklisted", e);
+        } catch(TimeoutException e) {
+            return false;
         }
         return false;
     }

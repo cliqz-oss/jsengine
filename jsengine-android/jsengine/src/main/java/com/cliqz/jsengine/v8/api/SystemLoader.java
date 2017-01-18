@@ -15,6 +15,7 @@ import com.eclipsesource.v8.V8ResultUndefined;
 import com.eclipsesource.v8.V8ScriptExecutionException;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -306,6 +307,14 @@ public class SystemLoader {
 
     public Object callFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {
         try {
+            return callFunctionOnModuleAttribute(0, modulePath, attribute, functionName, args);
+        } catch(TimeoutException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    public Object callFunctionOnModuleAttribute(final int timeout, final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException, TimeoutException {
+        try {
             return engine.queryEngine(new V8Engine.Query<Object>() {
                 @Override
                 public Object query(V8 runtime) {
@@ -315,14 +324,22 @@ public class SystemLoader {
                         throw new QueryException(e);
                     }
                 }
-            });
-        } catch(TimeoutException | InterruptedException e) {
+            }, timeout);
+        } catch(InterruptedException e) {
             throw new ExecutionException(e);
         }
     }
 
     public Object callFunctionOnModuleDefault(final String modulePath, final String functionName, final Object... args) throws ExecutionException {
-        return callFunctionOnModuleAttribute(modulePath, new String[] {"default"}, functionName, args);
+        try {
+            return callFunctionOnModuleDefault(0, modulePath, functionName, args);
+        } catch(TimeoutException e) {
+            throw new ExecutionException(e);
+        }
+    }
+
+    public Object callFunctionOnModuleDefault(int timeout, final String modulePath, final String functionName, final Object... args) throws ExecutionException, TimeoutException {
+        return callFunctionOnModuleAttribute(timeout, modulePath, new String[] {"default"}, functionName, args);
     }
 
     private Object _callFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {

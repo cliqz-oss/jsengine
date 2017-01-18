@@ -52,7 +52,7 @@ public class AntiTrackingTest {
 
     @After
     public void tearDown() throws Exception {
-        extension.shutdown(true);
+        extension.shutdown(false);
         // reset prefs
         appContext.deleteFile("cliqz.prefs.json");
     }

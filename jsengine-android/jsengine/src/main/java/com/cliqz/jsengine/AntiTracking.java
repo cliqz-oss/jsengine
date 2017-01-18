@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by sammacbeth on 21/10/2016.
@@ -82,10 +83,12 @@ public class AntiTracking {
 
     public boolean isWhitelisted(final String url) {
         try {
-            final Object whitelisted = engine.system.callFunctionOnModuleDefault(MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
+            final Object whitelisted = engine.system.callFunctionOnModuleDefault(50, MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
             return whitelisted.equals(Boolean.TRUE);
         } catch (ExecutionException e) {
             Log.e(TAG, "isWhitelisted", e);
+        } catch (TimeoutException e) {
+            return true;
         }
         return false;
     }
