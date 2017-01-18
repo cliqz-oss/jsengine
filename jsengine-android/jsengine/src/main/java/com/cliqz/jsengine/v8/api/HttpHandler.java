@@ -34,7 +34,6 @@ public class HttpHandler {
 
     final V8Engine engine;
     private final HttpRequestPolicy policy;
-    final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
     private boolean shutdownRequested = false;
 
     public HttpHandler(final V8Engine engine, HttpRequestPolicy policy) throws JSApiException {
@@ -57,12 +56,6 @@ public class HttpHandler {
             @Override
             public Object query(V8 runtime) {
                 shutdownRequested = true;
-                asyncExecutor.shutdown();
-                try {
-                    asyncExecutor.awaitTermination(10000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 return null;
             }
         });
@@ -90,7 +83,7 @@ public class HttpHandler {
             return false;
         }
 
-        asyncExecutor.submit(new Runnable() {
+        this.engine.getWorker().submit(new Runnable() {
             @Override
             public void run() {
                 try {

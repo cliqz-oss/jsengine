@@ -51,7 +51,7 @@ public class ChromeUrlHandler extends HttpHandler {
         final V8Function successCallback = (V8Function) callback.twin();
         final V8Function errorCallback = (V8Function) onerror.twin();
 
-        asyncExecutor.submit(new Runnable() {
+        engine.getWorker().submit(new Runnable() {
             @Override
             public void run() {
                 try {

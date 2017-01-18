@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,8 @@ public class V8Engine implements JSEngine {
 
     private boolean shutdown = false;
     boolean suppressShutdownCrash = true;
+
+    final ExecutorService workerService;
 
     public V8Engine() {
         v8Thread = new Thread(new Runnable() {
@@ -58,6 +62,7 @@ public class V8Engine implements JSEngine {
             }
         });
         v8Thread.start();
+        workerService = Executors.newFixedThreadPool(1);
     }
 
     public boolean isOnV8Thread() {
@@ -71,6 +76,18 @@ public class V8Engine implements JSEngine {
     public void shutdown(boolean strict) {
         // for a strict shutdown we crash if memory was leaked
         suppressShutdownCrash = !strict;
+
+        workerService.shutdown();
+        try {
+            workerService.awaitTermination(10000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            if (!suppressShutdownCrash) {
+                throw new RuntimeException(e);
+            } else {
+                Log.e(TAG, "Could not shutdown worker", e);
+            }
+        }
+
         // release JS engine resources and shutdown executor thread.
         Log.w(TAG, "V8 shutdown");
         for(Query q : shutdownHooks) {
@@ -186,5 +203,9 @@ public class V8Engine implements JSEngine {
         } catch (InterruptedException e) {
             Log.e(TAG, "Error executing Javascript", e);
         }
+    }
+
+    public ExecutorService getWorker() {
+        return workerService;
     }
 }
