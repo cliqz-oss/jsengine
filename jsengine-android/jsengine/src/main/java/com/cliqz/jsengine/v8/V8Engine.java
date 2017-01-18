@@ -77,17 +77,6 @@ public class V8Engine implements JSEngine {
         // for a strict shutdown we crash if memory was leaked
         suppressShutdownCrash = !strict;
 
-        workerService.shutdown();
-        try {
-            workerService.awaitTermination(10000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            if (!suppressShutdownCrash) {
-                throw new RuntimeException(e);
-            } else {
-                Log.e(TAG, "Could not shutdown worker", e);
-            }
-        }
-
         // release JS engine resources and shutdown executor thread.
         Log.w(TAG, "V8 shutdown");
         for(Query q : shutdownHooks) {
@@ -99,6 +88,18 @@ public class V8Engine implements JSEngine {
         }
         shutdownHooks.clear();
         shutdown = true;
+
+        workerService.shutdown();
+        try {
+            workerService.awaitTermination(10000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            if (!suppressShutdownCrash) {
+                throw new RuntimeException(e);
+            } else {
+                Log.e(TAG, "Could not shutdown worker", e);
+            }
+        }
+
         try {
             // submit a task to force-wake v8 thread.
             asyncQuery(new Query<Object>() {
