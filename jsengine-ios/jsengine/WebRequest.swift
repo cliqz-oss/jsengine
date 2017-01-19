@@ -8,12 +8,14 @@
 import UIKit
 import WebKit
 import JavaScriptCore
+import React
 
-public class WebRequest {
+@objc(WebRequest)
+class WebRequest : NSObject {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
     
-    init() {
+    override init() {
         
     }
     
@@ -46,16 +48,15 @@ public class WebRequest {
         tabs.setObject(webView, forKey: NSNumber(integer: tabId))
     }
     
-    func getUrlForTab(tabId: Int) -> String? {
-        if self.isTabActive(tabId) {
-            if let webView = tabs.objectForKey(tabId) as? UIWebView {
-                return webView.request?.URL?.absoluteString
-            }
-        }
-        return nil
+    @objc(isWindowActive:resolve:reject:)
+    func isWindowActive(tabId: NSNumber, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+        let active = isTabActive(tabId.integerValue)
+        resolve(active)
     }
     
-    func isTabActive(tabId: Int) -> Bool {
+    
+    //MARK: - Private Methods
+    private func isTabActive(tabId: Int) -> Bool {
         return tabs.objectForKey(tabId) != nil
     }
     

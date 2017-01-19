@@ -41,6 +41,7 @@
 		B30042231DF86B66004F9E14 /* WindowTimers.h in Headers */ = {isa = PBXBuildFile; fileRef = B30042211DF86B66004F9E14 /* WindowTimers.h */; };
 		B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */ = {isa = PBXBuildFile; fileRef = B30042221DF86B66004F9E14 /* WindowTimers.m */; };
 		B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3429D2B1DFEA69000F27916 /* HttpHandler.swift */; };
+		B3780DBD1E30F3BD00863B46 /* WebRequestBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */; };
 		B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */; };
 		B3CEA5D31DF6CA0000880EF8 /* jsengine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */; };
 		B3CEA5D81DF6CA0000880EF8 /* jsengineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CEA5D71DF6CA0000880EF8 /* jsengineTests.swift */; };
@@ -132,6 +133,7 @@
 		B30042221DF86B66004F9E14 /* WindowTimers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowTimers.m; sourceTree = "<group>"; };
 		B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jsengineBridging-Header.h"; sourceTree = "<group>"; };
 		B3429D2B1DFEA69000F27916 /* HttpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpHandler.swift; path = jsengine/HttpHandler.swift; sourceTree = SOURCE_ROOT; };
+		B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebRequestBridge.m; sourceTree = "<group>"; };
 		B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeUrlHandler.swift; sourceTree = "<group>"; };
 		B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = jsengine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CEA5CD1DF6CA0000880EF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */,
 				86173C141E1A7E1400015F5B /* PromiseCallback.swift */,
 				86CF91591E26355800AAB46B /* DebugLogger.swift */,
+				B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */,
 			);
 			path = jsengine;
 			sourceTree = "<group>";
@@ -695,6 +698,7 @@
 				860373BE1E08169800749750 /* SystemLoader.swift in Sources */,
 				86CF915A1E26355800AAB46B /* DebugLogger.swift in Sources */,
 				865D9A1A1E2CCFAF00B82F81 /* Adblocker.swift in Sources */,
+				B3780DBD1E30F3BD00863B46 /* WebRequestBridge.m in Sources */,
 				860373BA1E043C1200749750 /* WebRequest.swift in Sources */,
 				860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */,
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,

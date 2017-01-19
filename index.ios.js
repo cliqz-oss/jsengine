@@ -11,17 +11,24 @@ import {
 import { startup } from './ext/modules/platform/startup';
 import attrack from './ext/modules/antitracking/attrack';
 
+import { NativeModules } from 'react-native';
+
 class RNHighScores extends React.Component {
 
   constructor(props) {
     super(props);
-
-    this.state = {}
+    this.webRequests = NativeModules.WebRequest;
+    this.state = {
+      'active': 'n/a',
+    }
   }
 
   componentDidMount() {
-    startup().then(() => {
-      this.setState(attrack.getTabBlockingInfo(1));
+    // startup().then(() => {
+    //   this.setState({'attrack':attrack.getTabBlockingInfo(1)});
+    // });
+    NativeModules.WebRequest.isWindowActive(2).then((active) => {
+      this.setState({'active': String(active)});
     });
   }
 
@@ -30,8 +37,11 @@ class RNHighScores extends React.Component {
     // var contents = getPref('test', 'default');
     return (
       <View style={styles.container}>
+        <Text stype={styles.scores}>
+          {this.state.active}
+        </Text>
         <Text style={styles.scores}>
-          {JSON.stringify(this.state)}
+          {JSON.stringify(this.state.attrack)}
         </Text>
       </View>
     );
