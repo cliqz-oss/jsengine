@@ -8,18 +8,30 @@ import {
   View
 } from 'react-native';
 
+import { startup } from './ext/modules/platform/startup';
+import attrack from './ext/modules/antitracking/attrack';
+
 class RNHighScores extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {}
+  }
+
+  componentDidMount() {
+    startup().then(() => {
+      this.setState(attrack.getTabBlockingInfo(1));
+    });
+  }
+
   render() {
-    var contents = this.props["scores"].map(
-      score => <Text key={score.name}>{score.name}:{score.value}{"\n"}</Text>
-    );
+    // setPref('test', 'hi')
+    // var contents = getPref('test', 'default');
     return (
       <View style={styles.container}>
-        <Text style={styles.highScoresTitle}>
-          2048 High Scores!!!!!!
-        </Text>
         <Text style={styles.scores}>
-          {contents}
+          {JSON.stringify(this.state)}
         </Text>
       </View>
     );

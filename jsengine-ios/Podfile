@@ -14,7 +14,7 @@ target 'jsengine' do
  # needed for debugging
  # Add any other subspecs you want to use in your project
  ]
-
+pod 'RNFS', :path => '../node_modules/react-native-fs'
 end
 
 target 'TestApp' do 
@@ -28,5 +28,6 @@ target 'TestApp' do
  # needed for debugging
  # Add any other subspecs you want to use in your project
  ]
+pod 'RNFS', :path => '../node_modules/react-native-fs'
 
 end

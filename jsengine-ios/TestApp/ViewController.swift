@@ -11,7 +11,8 @@ import jsengine
 import React
 
 class ViewController: UIViewController {
-    let x = Engine(bundle: NSBundle.mainBundle())
+
+//    let x = Engine()
     override func viewDidLoad() {
         super.viewDidLoad()
         
