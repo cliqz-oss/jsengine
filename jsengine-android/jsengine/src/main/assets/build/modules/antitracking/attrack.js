@@ -404,7 +404,7 @@ System.register('antitracking/attrack', ['antitracking/pacemaker', 'antitracking
             }
             return true;
           }, function checkShouldBlock(state) {
-            return state.badTokens.length > 0 && CliqzAttrack.qs_whitelist.isUpToDate();
+            return state.badTokens.length > 0;
           }, CliqzAttrack.applyBlock.bind(CliqzAttrack)];
 
           // create pipeline for on modify request
