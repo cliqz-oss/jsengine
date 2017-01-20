@@ -12,8 +12,8 @@ import JavaScriptCore
 public class Engine {
     
     //MARK: - Constants
-    private let dispatchQueue = dispatch_queue_create("com.cliqz.AntiTracking", DISPATCH_QUEUE_SERIAL)
-    private let timersDispatchQueue = dispatch_queue_create("com.cliqz.Timers", DISPATCH_QUEUE_SERIAL)
+    let dispatchQueue = dispatch_queue_create("com.cliqz.AntiTracking", DISPATCH_QUEUE_SERIAL)
+    let timersDispatchQueue = dispatch_queue_create("com.cliqz.Timers", DISPATCH_QUEUE_SERIAL)
     
     //MARK: - Instant variables
     var jsengine: JSContext? = nil
@@ -25,10 +25,15 @@ public class Engine {
     var mIsRunning: Bool = false
 
     //MARK: - Singltone
-    static let sharedInstance = Engine()
+    static let sharedInstance = Engine(bundle: NSBundle.mainBundle())
     
     //MARK: - Init
-    public init() {
+    public init(bundle: NSBundle) {
+        self.fileIO = FileIO(queue:self.dispatchQueue)
+        let crypto = Crypto()
+        self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
+        self.webRequest = WebRequest()
+        
         dispatch_async(dispatchQueue) {
             self.jsengine = JSContext()
             self.jsengine!.exceptionHandler = { context, exception in
@@ -37,21 +42,11 @@ public class Engine {
             let w = WTWindowTimers(self.timersDispatchQueue)
             w.extend(self.jsengine)
             
-            self.fileIO = FileIO(queue:self.dispatchQueue)
             self.fileIO!.extend(self.jsengine!)
-            
-            let crypto = Crypto()
             crypto.extend(self.jsengine!)
-            
-            self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
             self.http!.extend(self.jsengine!)
-            
-            self.webRequest = WebRequest()
             self.webRequest!.extend(self.jsengine!)
-            
-            self.systemLoader = SystemLoader(context: self.jsengine!, buildRoot: "assets", bundle: NSBundle.mainBundle())
-            
-            self.startup()
+            self.systemLoader = SystemLoader(context: self.jsengine!, assetsRoot: "assets", buildRoot: "/build/modules/", bundle: bundle)
         }
     }
     
@@ -64,7 +59,7 @@ public class Engine {
         dispatch_async(dispatchQueue) {[weak self] in
             do {
                 if let jsengine = self?.jsengine ,let systemLoader = self?.systemLoader {
-                    let config = systemLoader.readSourceFile("/build/config/cliqz", fileExtension: "json")
+                    let config = systemLoader.readSourceFile("cliqz", buildPath: "/build/config/", fileExtension: "json")
                     jsengine.evaluateScript("var __CONFIG__ = JSON.parse('\(config!)');")
                     let defaultJSON = self?.parseJSON(defaultPrefs!)
                     jsengine.evaluateScript("var __DEFAULTPREFS__ = \(defaultJSON!);")
@@ -82,16 +77,29 @@ public class Engine {
         self.mIsRunning = false
     }
     
-    func setPref(prefName: String, prefValue: AnyObject) throws {
-        try systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "setPref", arguments: [prefName, prefValue])
+    func setPref(prefName: String, prefValue: AnyObject) {
+        dispatch_async(self.dispatchQueue) {
+            do {
+                try self.systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "setPref", arguments: [prefName, prefValue])
+            } catch let error as NSError {
+                DebugLogger.log("<< Error while executing Engine.setPref: \(error)")
+            }
+            
+        }
     }
     
     func getPref(prefName: String) throws -> AnyObject? {
+        guard isRunning() else {
+            return nil
+        }
+        
         return try systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "getPref", arguments: [prefName])
     }
     
-    func setLoggingEnabled(enabled: Bool) throws {
-        try self.setPref("showConsoleLogs", prefValue: enabled)
+    func setLoggingEnabled(enabled: Bool) {
+        dispatch_async(self.dispatchQueue) { 
+            self.setPref("showConsoleLogs", prefValue: enabled)
+        }
     }
     
     func parseJSON(dictionary: [String: AnyObject]) -> String {
