@@ -11,17 +11,19 @@ import Foundation
 class SystemLoader {
 
     private weak var jsContext: JSContext? = nil
+    private var assetsRoot: String
     private var buildRoot: String
     private var bundle: NSBundle
     private var moduleCache: [String:JSValue] = [String:JSValue]()
     
-    init(context: JSContext, buildRoot: String, bundle: NSBundle) {
+    init(context: JSContext, assetsRoot: String, buildRoot: String, bundle: NSBundle) {
         self.jsContext = context
+        self.assetsRoot = assetsRoot
         self.buildRoot = buildRoot
         self.bundle = bundle
      
         let loadSubScript: @convention(block) (String) -> () = {[weak self] assetPath in
-                self?.loadJavascriptSource("/build/modules\(assetPath)")
+                self?.loadSubScript(assetPath)
         }
         context.setObject(unsafeBitCast(loadSubScript, AnyObject.self), forKeyedSubscript: "loadSubScript")
         
@@ -44,9 +46,9 @@ class SystemLoader {
 
     }
     
-    func readSourceFile(assetPath: String, fileExtension: String) -> String? {
+    func readSourceFile(assetPath: String, buildPath: String, fileExtension: String) -> String? {
         var content: String? = nil
-        let (sourceName, directory) = getSourceMetaData(assetPath)
+        let (sourceName, directory) = getSourceMetaData(assetPath, buildPath: buildPath)
         if let path = self.bundle.pathForResource(sourceName, ofType: fileExtension, inDirectory: directory){
             content = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
         } else {
@@ -102,15 +104,23 @@ class SystemLoader {
         return module!
     }
     
-    private func loadJavascriptSource(assetPath: String) {
-        if let content = readSourceFile(assetPath, fileExtension: "js") {
+    func loadSubScript(assetPath: String) {
+        if let content = readSourceFile(assetPath, buildPath: self.buildRoot, fileExtension: "js") {
             self.jsContext?.evaluateScript(content)
         } else {
             DebugLogger.log("<< Could not load file: \(assetPath)")
         }
     }
     
-    private func getSourceMetaData(assetPath: String) -> (String, String) {
+    private func loadJavascriptSource(assetPath: String) {
+        if let content = readSourceFile(assetPath, buildPath: "", fileExtension: "js") {
+            self.jsContext?.evaluateScript(content)
+        } else {
+            DebugLogger.log("<< Could not load file: \(assetPath)")
+        }
+    }
+    
+    private func getSourceMetaData(assetPath: String, buildPath: String) -> (String, String) {
         var sourceName: String
         var directory: String
         // seperate the folder path and the file name of the asset
@@ -118,10 +128,10 @@ class SystemLoader {
             var pathComponents = assetPath.componentsSeparatedByString("/")
             sourceName = pathComponents.last!
             pathComponents.removeLast()
-            directory = self.buildRoot + pathComponents.joinWithSeparator("/")
+            directory = self.assetsRoot + buildPath + pathComponents.joinWithSeparator("/")
         } else {
             sourceName = assetPath
-            directory = self.buildRoot
+            directory = self.assetsRoot + buildPath
         }
         
         // remove file extension

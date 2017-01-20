@@ -38,18 +38,26 @@ class AntiTracking {
         return prefs
     }
     
-    func setEnabled(enabled: Bool) throws {
-        try self.engine.setPref(AntiTracking.bloomFilterPref, prefValue: true)
-        try self.engine.setPref(AntiTracking.qsBlockingPref, prefValue: true)
-        try self.engine.setPref(AntiTracking.enablePref, prefValue: true)
-        try self.engine.setPref("modules." + AntiTracking.moduleName + ".enabled", prefValue: enabled)
+    func setEnabled(enabled: Bool) {
+        dispatch_async(self.engine.dispatchQueue) { 
+            self.engine.setPref(AntiTracking.bloomFilterPref, prefValue: true)
+            self.engine.setPref(AntiTracking.qsBlockingPref, prefValue: true)
+            self.engine.setPref(AntiTracking.enablePref, prefValue: true)
+            self.engine.setPref("modules." + AntiTracking.moduleName + ".enabled", prefValue: enabled)
+        }
     }
     
-    func setForceBlockEnabled(enabled: Bool) throws {
-        try self.engine.setPref(AntiTracking.forceBlockPref, prefValue: enabled)
+    func setForceBlockEnabled(enabled: Bool) {
+        dispatch_async(self.engine.dispatchQueue) {
+            self.engine.setPref(AntiTracking.forceBlockPref, prefValue: enabled)
+        }
     }
     
     func getTabBlockingInfo(tabId: Int) -> [NSObject : AnyObject]? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
         do {
             var argument = [AnyObject]()
             argument.append(tabId)
@@ -64,7 +72,11 @@ class AntiTracking {
         return nil
     }
     
-    func isWhitelisted(url: String) -> Bool {
+    func isWhitelisted(url: String) -> Bool? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
         do {
             let whitelisted = try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "isSourceWhitelisted", arguments: [url])
             if let whitelisted =  whitelisted {
@@ -78,7 +90,7 @@ class AntiTracking {
     
     func addDomainToWhitelist(url: String) {
         do {
-            try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "addSourceDomainToWhitelist", arguments: [url])
+            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "addSourceDomainToWhitelist", arguments: [url])
         } catch let error as NSError {
             DebugLogger.log("<< Error in AntiTracking.addDomainToWhitelist: \(error)")
         }
@@ -86,11 +98,9 @@ class AntiTracking {
     
     func removeDomainFromWhitelist(url: String) {
         do {
-            try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "removeSourceDomainFromWhitelist", arguments: [url])
+            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "removeSourceDomainFromWhitelist", arguments: [url])
         } catch let error as NSError {
             DebugLogger.log("<< Error in AntiTracking.removeDomainFromWhitelist: \(error)")
         }
     }
-    
-    
 }

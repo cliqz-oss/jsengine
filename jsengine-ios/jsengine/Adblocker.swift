@@ -33,13 +33,19 @@ class Adblocker {
         return prefs
     }
     
-    func setEnabled(enabled: Bool) throws {
-        try self.engine.setPref(Adblocker.abTestPref, prefValue: true)
-        try self.engine.setPref(Adblocker.enablePref, prefValue: enabled ? 1 : 0)
-        try self.engine.setPref("modules." + Adblocker.moduleName + ".enabled", prefValue: enabled)
+    func setEnabled(enabled: Bool) {
+        dispatch_async(self.engine.dispatchQueue) {
+            self.engine.setPref(Adblocker.abTestPref, prefValue: true)
+            self.engine.setPref(Adblocker.enablePref, prefValue: enabled ? 1 : 0)
+            self.engine.setPref("modules." + Adblocker.moduleName + ".enabled", prefValue: enabled)
+        }
     }
     
     func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
         do {
             let stats = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adbStats"], functionName: "report", arguments: [url])
             return stats?.toDictionary()
@@ -49,7 +55,11 @@ class Adblocker {
         return nil
     }
     
-    func isBlacklisted(url: String) -> Bool {
+    func isBlacklisted(url: String) -> Bool? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
         do {
             let blacklisted = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "isDomainInBlacklist", arguments: [url])
             if let blacklisted =  blacklisted {
@@ -63,7 +73,7 @@ class Adblocker {
     
     func toggleUrl(url: String, domain: Bool) {
         do {
-            try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
+            try self.engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
         } catch let error as NSError {
             DebugLogger.log("<< Error in Adblocker.toggleUrl: \(error)")
         }
