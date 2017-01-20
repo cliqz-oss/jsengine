@@ -17,38 +17,47 @@ public class Engine {
     let timersDispatchQueue = dispatch_queue_create("com.cliqz.Timers", DISPATCH_QUEUE_SERIAL)
     
     //MARK: - Instant variables
-    var jsengine: JSContext? = nil
-    var buildPath = "build"
-    var fileIO: FileIO?
-    var http: HttpHandler?
-    var webRequest: WebRequest?
-    var systemLoader: SystemLoader?
-    var mIsRunning: Bool = false
+//    var jsengine: JSContext? = nil
+//    var buildPath = "build"
+//    var fileIO: FileIO?
+//    var http: HttpHandler?
+    public var webRequest: WebRequest?
 
     //MARK: - Singltone
     static let sharedInstance = Engine(bundle: NSBundle.mainBundle())
     
+    let bridgeDelegate = ReactBridgeDelegate()
+    let bridge : RCTBridge
+    public let rootView : RCTRootView
+    
     //MARK: - Init
-    public init(bundle: NSBundle) {
-        self.fileIO = FileIO(queue:self.dispatchQueue)
-        let crypto = Crypto()
-        self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
-        self.webRequest = WebRequest()
-        
-        dispatch_async(dispatchQueue) {
-            self.jsengine = JSContext()
-            self.jsengine!.exceptionHandler = { context, exception in
-                DebugLogger.log("<< JS Error: \(exception)")
-            }
-            let w = WTWindowTimers(self.timersDispatchQueue)
-            w.extend(self.jsengine)
-            
-            self.fileIO!.extend(self.jsengine!)
-            crypto.extend(self.jsengine!)
-            self.http!.extend(self.jsengine!)
-            self.webRequest!.extend(self.jsengine!)
-            self.systemLoader = SystemLoader(context: self.jsengine!, assetsRoot: "assets", buildRoot: "/build/modules/", bundle: bundle)
-        }
+    public init() {
+        let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
+        //		let mockData:NSDictionary = ["scores": [ ["name":"Alex", "value":"42"], ["name":"Joel", "value":"10"] ] ]
+        rootView = RCTRootView( bundleURL: jsCodeLocation, moduleName: "RNHighScores", initialProperties: nil, launchOptions: nil )
+        bridge = rootView.bridge
+        webRequest = bridge.moduleForClass(WebRequest) as? WebRequest
+                
+//        dispatch_async(dispatchQueue) {
+//            self.jsengine = JSContext()
+//            self.jsengine!.exceptionHandler = { context, exception in
+//                print("JS Error: \(exception)")
+//            }
+//            let w = WTWindowTimers(self.dispatchQueue)
+//            w.extend(self.jsengine)
+//            
+//            self.fileIO = FileIO(queue:self.dispatchQueue)
+//            self.fileIO!.extend(self.jsengine!)
+//            
+//            let crypto = Crypto()
+//            crypto.extend(self.jsengine!)
+//            
+//            self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
+//            self.http!.extend(self.jsengine!)
+//            
+//            self.webRequest = WebRequest(nil)
+//            self.webRequest!.extend(self.jsengine!)
+//        }
     }
     
     //MARK: - Public APIs
@@ -78,6 +87,7 @@ public class Engine {
         self.mIsRunning = false
     }
     
+<<<<<<< HEAD
     public func setPref(prefName: String, prefValue: AnyObject) {
         dispatch_async(self.dispatchQueue) {
             do {
@@ -101,6 +111,14 @@ public class Engine {
         dispatch_async(self.dispatchQueue) { 
             self.setPref("showConsoleLogs", prefValue: enabled)
         }
+=======
+    func setPref(prefName: String, prefValue: Any) {
+//        self.jsengine?.evaluateScript("")
+    }
+    
+    func getPref(prefName: String) {
+//        self.jsengine?.evaluateScript("")
+>>>>>>> 2d99d96... Test sending message from native to react.
     }
     
     public func parseJSON(dictionary: [String: AnyObject]) -> String {
@@ -115,4 +133,5 @@ public class Engine {
         }
         return "{}"
     }
+    
 }

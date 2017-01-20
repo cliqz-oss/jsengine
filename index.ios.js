@@ -11,7 +11,13 @@ import {
 import { startup } from './ext/modules/platform/startup';
 import attrack from './ext/modules/antitracking/attrack';
 
-import { NativeModules } from 'react-native';
+import { NativeModules, NativeEventEmitter } from 'react-native';
+
+startup();
+
+const myModuleEvt = new NativeEventEmitter(NativeModules.WebRequest)
+myModuleEvt.addListener('webRequest', (data) => console.log(data))
+console.log(myModuleEvt);
 
 class RNHighScores extends React.Component {
 
@@ -21,6 +27,7 @@ class RNHighScores extends React.Component {
     this.state = {
       'active': 'n/a',
     }
+
   }
 
   componentDidMount() {

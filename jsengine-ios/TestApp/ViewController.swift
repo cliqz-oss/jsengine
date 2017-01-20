@@ -11,11 +11,12 @@ import jsengine
 import React
 
 class ViewController: UIViewController {
+    
+    let jsengine : Engine = Engine()
 
-//    let x = Engine()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+ 
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -25,14 +26,27 @@ class ViewController: UIViewController {
     }
 
 	@IBAction func showReactView() {
+
+        let vc = UIViewController()
+        vc.view = self.jsengine.rootView
+        self.presentViewController(vc, animated: true, completion: nil)
         
-		let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
-//		let mockData:NSDictionary = ["scores": [ ["name":"Alex", "value":"42"], ["name":"Joel", "value":"10"] ] ]
-		let rootView = RCTRootView( bundleURL: jsCodeLocation, moduleName: "RNHighScores", initialProperties: nil, launchOptions: nil )
-		let vc = UIViewController()
-		vc.view = rootView
-		self.presentViewController(vc, animated: true, completion: nil)
+        var requestInfo = [String: AnyObject]()
+        requestInfo["url"] = "https://cliqz.com"
+        requestInfo["method"] = "GET"
+        requestInfo["tabId"] = 1234231
+        requestInfo["parentFrameId"] = -1
+        // TODO: frameId how to calculate
+        requestInfo["frameId"] = 1234231
+        requestInfo["isPrivate"] = false
+        requestInfo["originUrl"] = ""
+        requestInfo["type"] = 7;
+
+        let resp = self.jsengine.webRequest?.getBlockResponseForRequest(requestInfo)
+        print(resp)
 	}
+    
+    
 
 }
 

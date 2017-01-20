@@ -43,6 +43,7 @@
 		B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3429D2B1DFEA69000F27916 /* HttpHandler.swift */; };
 		B3780DBD1E30F3BD00863B46 /* WebRequestBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */; };
 		B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */; };
+		B3B1D7ED1E321F0800B73619 /* ReactBridgeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3B1D7EC1E321F0800B73619 /* ReactBridgeDelegate.swift */; };
 		B3CEA5D31DF6CA0000880EF8 /* jsengine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */; };
 		B3CEA5D81DF6CA0000880EF8 /* jsengineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3CEA5D71DF6CA0000880EF8 /* jsengineTests.swift */; };
 		E14016358C976F14BC7C0740 /* Pods_TestApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B82DE2883C817F55695A9E7 /* Pods_TestApp.framework */; };
@@ -135,6 +136,7 @@
 		B3429D2B1DFEA69000F27916 /* HttpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpHandler.swift; path = jsengine/HttpHandler.swift; sourceTree = SOURCE_ROOT; };
 		B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebRequestBridge.m; sourceTree = "<group>"; };
 		B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeUrlHandler.swift; sourceTree = "<group>"; };
+		B3B1D7EC1E321F0800B73619 /* ReactBridgeDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReactBridgeDelegate.swift; sourceTree = "<group>"; };
 		B3CEA5C91DF6CA0000880EF8 /* jsengine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = jsengine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3CEA5CD1DF6CA0000880EF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B3CEA5D21DF6CA0000880EF8 /* jsengineTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jsengineTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -311,6 +313,7 @@
 				86173C141E1A7E1400015F5B /* PromiseCallback.swift */,
 				86CF91591E26355800AAB46B /* DebugLogger.swift */,
 				B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */,
+				B3B1D7EC1E321F0800B73619 /* ReactBridgeDelegate.swift */,
 			);
 			path = jsengine;
 			sourceTree = "<group>";
@@ -699,6 +702,7 @@
 				86CF915A1E26355800AAB46B /* DebugLogger.swift in Sources */,
 				865D9A1A1E2CCFAF00B82F81 /* Adblocker.swift in Sources */,
 				B3780DBD1E30F3BD00863B46 /* WebRequestBridge.m in Sources */,
+				B3B1D7ED1E321F0800B73619 /* ReactBridgeDelegate.swift in Sources */,
 				860373BA1E043C1200749750 /* WebRequest.swift in Sources */,
 				860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */,
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,

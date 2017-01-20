@@ -11,14 +11,23 @@ import JavaScriptCore
 import React
 
 @objc(WebRequest)
-class WebRequest : NSObject {
+public class WebRequest : RCTEventEmitter {
+    
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
     
-    override init() {
-        
+    public override init() {
+        super.init()
     }
     
+    public override static func moduleName() -> String! {
+        return "WebRequest"
+    }
+    
+    override public func supportedEvents() -> [String]! {
+        return ["webRequest"]
+    }
+
     func extend(context: JSContext) {
         self.jsContext = context
         let webRequest = JSValue.init(newObjectInContext: context)
@@ -60,15 +69,16 @@ class WebRequest : NSObject {
         return tabs.objectForKey(tabId) != nil
     }
     
-    //MARK: - Private Methods
-    
-    private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
+    public func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
+        self.sendEventWithName("webRequest", body: requestInfo)
         
-        if let requestInfoJsonString = toJSONString(requestInfo) {
-            let onBeforeRequestCall = "System.get('platform/webrequest').default.onBeforeRequest._trigger(\(requestInfoJsonString));"
-            let blockResponse = self.jsContext?.evaluateScript(onBeforeRequestCall).toDictionary()
-            return blockResponse
-        }
+//        self.bridge.eventDispatcher().sendAppEventWithName("webRequest", body: requestInfo)
+//        self.bridge.enqueueJSCall("ext/modules/platform/webrequest", method: "_trigger", args: [requestInfo]) {
+//            print("Doneee")
+//        }
+//        if let blockResponse = try? self.bridge.callFunctionOnModule("ext/modules/platform/webrequest", method: "_trigger", arguments: [requestInfo]).toDictionary() {
+//            return blockResponse
+//        }
         return nil
     }
     
