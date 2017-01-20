@@ -5,37 +5,37 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  ListView,
 } from 'react-native';
 
-import { startup } from './ext/modules/platform/startup';
-import attrack from './ext/modules/antitracking/attrack';
+import { startup, getApp } from './ext/modules/platform/startup';
 
 import { NativeModules, NativeEventEmitter } from 'react-native';
 
-startup();
-
-const myModuleEvt = new NativeEventEmitter(NativeModules.WebRequest)
-myModuleEvt.addListener('webRequest', (data) => console.log(data))
-console.log(myModuleEvt);
-
-class RNHighScores extends React.Component {
+class ExtensionApp extends React.Component {
 
   constructor(props) {
     super(props);
     this.webRequests = NativeModules.WebRequest;
     this.state = {
-      'active': 'n/a',
+      modules: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
     }
-
   }
 
   componentDidMount() {
-    // startup().then(() => {
-    //   this.setState({'attrack':attrack.getTabBlockingInfo(1)});
-    // });
-    NativeModules.WebRequest.isWindowActive(2).then((active) => {
-      this.setState({'active': String(active)});
+    startup().then(() => {
+      this.app = getApp();
+      setInterval(() => {
+        const modules = this.app.modules().map((m) => {
+            return {
+              name: m.name,
+              isEnabled: m.isEnabled,
+              loadingTime: m.loadingTime,
+            }
+          });
+        this.setState({ modules: this.state.modules.cloneWithRows(modules) })
+      }, 1000)
     });
   }
 
@@ -45,14 +45,23 @@ class RNHighScores extends React.Component {
     return (
       <View style={styles.container}>
         <Text stype={styles.scores}>
-          {this.state.active}
+          Extension Modules
         </Text>
-        <Text style={styles.scores}>
-          {JSON.stringify(this.state.attrack)}
-        </Text>
+        <ListView
+          dataSource={this.state.modules}
+          renderRow={this._renderRow}
+        />
       </View>
     );
   }
+
+  _renderRow(mod) {
+    const text = `${mod.name}, enabled: ${mod.isEnabled} (${mod.loadingTime})`
+    return (
+      <Text>{text}</Text>
+    )
+  }
+
 }
 
 const styles = StyleSheet.create({
@@ -60,7 +69,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'red',
+    backgroundColor: 'white',
   },
   highScoresTitle: {
     fontSize: 20,
@@ -75,4 +84,4 @@ const styles = StyleSheet.create({
 });
 
 // Module name
-AppRegistry.registerComponent('RNHighScores', () => RNHighScores);
+AppRegistry.registerComponent('ExtensionApp', () => ExtensionApp);

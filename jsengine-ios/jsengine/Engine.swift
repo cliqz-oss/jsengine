@@ -26,38 +26,17 @@ public class Engine {
     //MARK: - Singltone
     static let sharedInstance = Engine(bundle: NSBundle.mainBundle())
     
-    let bridgeDelegate = ReactBridgeDelegate()
     let bridge : RCTBridge
     public let rootView : RCTRootView
     
     //MARK: - Init
     public init() {
-        let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
-        //		let mockData:NSDictionary = ["scores": [ ["name":"Alex", "value":"42"], ["name":"Joel", "value":"10"] ] ]
-        rootView = RCTRootView( bundleURL: jsCodeLocation, moduleName: "RNHighScores", initialProperties: nil, launchOptions: nil )
+//        let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
+        let jsCodeLocation = NSBundle.mainBundle().URLForResource("main", withExtension: "jsbundle")
+        rootView = RCTRootView( bundleURL: jsCodeLocation, moduleName: "ExtensionApp", initialProperties: nil, launchOptions: nil )
         bridge = rootView.bridge
         webRequest = bridge.moduleForClass(WebRequest) as? WebRequest
-                
-//        dispatch_async(dispatchQueue) {
-//            self.jsengine = JSContext()
-//            self.jsengine!.exceptionHandler = { context, exception in
-//                print("JS Error: \(exception)")
-//            }
-//            let w = WTWindowTimers(self.dispatchQueue)
-//            w.extend(self.jsengine)
-//            
-//            self.fileIO = FileIO(queue:self.dispatchQueue)
-//            self.fileIO!.extend(self.jsengine!)
-//            
-//            let crypto = Crypto()
-//            crypto.extend(self.jsengine!)
-//            
-//            self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
-//            self.http!.extend(self.jsengine!)
-//            
-//            self.webRequest = WebRequest(nil)
-//            self.webRequest!.extend(self.jsengine!)
-//        }
+
     }
     
     //MARK: - Public APIs

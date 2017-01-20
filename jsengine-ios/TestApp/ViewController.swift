@@ -26,12 +26,9 @@ class ViewController: UIViewController {
     }
 
 	@IBAction func showReactView() {
-
-        let vc = UIViewController()
-        vc.view = self.jsengine.rootView
-        self.presentViewController(vc, animated: true, completion: nil)
         
         var requestInfo = [String: AnyObject]()
+        requestInfo["id"] = 1
         requestInfo["url"] = "https://cliqz.com"
         requestInfo["method"] = "GET"
         requestInfo["tabId"] = 1234231
@@ -39,11 +36,17 @@ class ViewController: UIViewController {
         // TODO: frameId how to calculate
         requestInfo["frameId"] = 1234231
         requestInfo["isPrivate"] = false
-        requestInfo["originUrl"] = ""
-        requestInfo["type"] = 7;
+        requestInfo["source"] = "https://cliqz.com"
+        requestInfo["type"] = 6;
+        
+//        let resp = self.jsengine.webRequest?.getBlockResponseForRequest(requestInfo)
+//        print(resp)
 
-        let resp = self.jsengine.webRequest?.getBlockResponseForRequest(requestInfo)
-        print(resp)
+        let vc = UIViewController()
+        vc.view = self.jsengine.rootView
+        self.presentViewController(vc, animated: true, completion: nil)
+        
+        
 	}
     
     

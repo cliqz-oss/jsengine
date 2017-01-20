@@ -15,6 +15,9 @@ public class WebRequest : RCTEventEmitter {
     
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
+    var requestSerial = 0
+    var blockingResponses = [Int: NSDictionary]()
+    var lockSemaphore: dispatch_semaphore_t = dispatch_semaphore_create(0)
     
     public override init() {
         super.init()
@@ -69,20 +72,29 @@ public class WebRequest : RCTEventEmitter {
         return tabs.objectForKey(tabId) != nil
     }
     
-    public func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
+    public func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> NSDictionary? {
+        let requestId = requestInfo["id"] as! Int
+        let eventSubmitAt = NSDate()
         self.sendEventWithName("webRequest", body: requestInfo)
-        
-//        self.bridge.eventDispatcher().sendAppEventWithName("webRequest", body: requestInfo)
-//        self.bridge.enqueueJSCall("ext/modules/platform/webrequest", method: "_trigger", args: [requestInfo]) {
-//            print("Doneee")
-//        }
-//        if let blockResponse = try? self.bridge.callFunctionOnModule("ext/modules/platform/webrequest", method: "_trigger", arguments: [requestInfo]).toDictionary() {
-//            return blockResponse
-//        }
-        return nil
+
+        while self.blockingResponses[requestId] == nil && eventSubmitAt.timeIntervalSinceNow < 0.2 {
+            dispatch_semaphore_wait(lockSemaphore, dispatch_time(DISPATCH_TIME_NOW, 100 * 1000 * 1000))
+        }
+
+        let response = self.blockingResponses[requestId]
+        self.blockingResponses[requestId] = nil;
+        return response
+    }
+    
+    @objc(blockingResponseReply:response:)
+    func blockingResponseReply(requestId: NSNumber, response: NSDictionary) {
+        self.blockingResponses[requestId as Int] = response
+        dispatch_semaphore_signal(lockSemaphore)
     }
     
     private func getRequestInfo(request: NSURLRequest) -> [String: AnyObject] {
+        let requestId = requestSerial;
+        requestSerial += 1;
         let url = request.URL?.absoluteString
         let userAgent = request.allHTTPHeaderFields?["User-Agent"]
         
@@ -92,6 +104,7 @@ public class WebRequest : RCTEventEmitter {
         let originUrl = request.mainDocumentURL?.absoluteString
         
         var requestInfo = [String: AnyObject]()
+        requestInfo["id"] = requestId
         requestInfo["url"] = url
         requestInfo["method"] = request.HTTPMethod
         requestInfo["tabId"] = tabId ?? -1
