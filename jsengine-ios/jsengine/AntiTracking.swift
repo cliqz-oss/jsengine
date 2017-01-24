@@ -53,6 +53,16 @@ public class AntiTracking {
         }
     }
     
+    public func getUnsafeRequestsCounter(tabId: Int) -> Int? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
+        let blockingInfo = getTabBlockingInfo(tabId)
+        let blockingInfoRequests = blockingInfo!["requests"]! as! Dictionary<String, Int>
+        return blockingInfoRequests["unsafe"]
+    }
+    
     public func getTabBlockingInfo(tabId: Int) -> [NSObject : AnyObject]? {
         guard self.engine.isRunning() else {
             return nil

@@ -41,6 +41,15 @@ public class Adblocker {
         }
     }
     
+    public func getAdsCounter(url: String) -> Int? {
+        guard self.engine.isRunning() else {
+            return nil
+        }
+        
+        let blockingInfo = getAdBlockingInfo(url)
+        return blockingInfo!["totalCount"] as? Int
+    }
+    
     public func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
         guard self.engine.isRunning() else {
             return nil
