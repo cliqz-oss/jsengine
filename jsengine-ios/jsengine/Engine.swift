@@ -51,11 +51,11 @@ public class Engine {
     }
     
     //MARK: - Public APIs
-    func isRunning() -> Bool {
+    public func isRunning() -> Bool {
         return self.mIsRunning
     }
     
-    func startup(defaultPrefs: [String: AnyObject]? = [String: AnyObject]()) {
+    public func startup(defaultPrefs: [String: AnyObject]? = [String: AnyObject]()) {
         dispatch_async(dispatchQueue) {[weak self] in
             do {
                 if let jsengine = self?.jsengine ,let systemLoader = self?.systemLoader {
@@ -72,12 +72,12 @@ public class Engine {
         }
     }
     
-    func shutdown(strict: Bool? = false) throws {
+    public func shutdown(strict: Bool? = false) throws {
         try systemLoader?.callVoidFunctionOnModule("platform/startup", functionName: "shutdown")
         self.mIsRunning = false
     }
     
-    func setPref(prefName: String, prefValue: AnyObject) {
+    public func setPref(prefName: String, prefValue: AnyObject) {
         dispatch_async(self.dispatchQueue) {
             do {
                 try self.systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "setPref", arguments: [prefName, prefValue])
@@ -88,7 +88,7 @@ public class Engine {
         }
     }
     
-    func getPref(prefName: String) throws -> AnyObject? {
+    public func getPref(prefName: String) throws -> AnyObject? {
         guard isRunning() else {
             return nil
         }
@@ -96,13 +96,13 @@ public class Engine {
         return try systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "getPref", arguments: [prefName])
     }
     
-    func setLoggingEnabled(enabled: Bool) {
+    public func setLoggingEnabled(enabled: Bool) {
         dispatch_async(self.dispatchQueue) { 
             self.setPref("showConsoleLogs", prefValue: enabled)
         }
     }
     
-    func parseJSON(dictionary: [String: AnyObject]) -> String {
+    public func parseJSON(dictionary: [String: AnyObject]) -> String {
         if NSJSONSerialization.isValidJSONObject(dictionary) {
             do {
                 let data = try NSJSONSerialization.dataWithJSONObject(dictionary, options: [])

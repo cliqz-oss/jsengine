@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 import JavaScriptCore
 
-class WebRequest {
+public class WebRequest {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
     
@@ -96,7 +96,7 @@ class WebRequest {
         return requestInfo
     }
     
-    private func generateUniqueUserAgent(baseUserAgent: String, tabId: Int) -> String {
+    public class func generateUniqueUserAgent(baseUserAgent: String, tabId: Int) -> String {
         let uniqueUserAgent = baseUserAgent + String(format:" _id/%06d", tabId)
         return uniqueUserAgent
     }
