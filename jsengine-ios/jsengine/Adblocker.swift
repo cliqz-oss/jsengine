@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Adblocker {
+public class Adblocker {
     
     //MARK: - Constants
     private static let moduleName = "adblocker"
@@ -24,7 +24,7 @@ class Adblocker {
     }
     
     //MARK: - Public APIs
-    class func getDefaultPrefs(enabled: Bool? = true) -> [String: AnyObject] {
+    public class func getDefaultPrefs(enabled: Bool? = true) -> [String: AnyObject] {
         var prefs: [String:AnyObject] = [String:AnyObject]()
         prefs[Adblocker.enablePref] = 1
         prefs[Adblocker.abTestPref] = true
@@ -33,7 +33,7 @@ class Adblocker {
         return prefs
     }
     
-    func setEnabled(enabled: Bool) {
+    public func setEnabled(enabled: Bool) {
         dispatch_async(self.engine.dispatchQueue) {
             self.engine.setPref(Adblocker.abTestPref, prefValue: true)
             self.engine.setPref(Adblocker.enablePref, prefValue: enabled ? 1 : 0)
@@ -41,7 +41,7 @@ class Adblocker {
         }
     }
     
-    func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
+    public func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
         guard self.engine.isRunning() else {
             return nil
         }
@@ -55,7 +55,7 @@ class Adblocker {
         return nil
     }
     
-    func isBlacklisted(url: String) -> Bool? {
+    public func isBlacklisted(url: String) -> Bool? {
         guard self.engine.isRunning() else {
             return nil
         }
@@ -71,7 +71,7 @@ class Adblocker {
         return false
     }
     
-    func toggleUrl(url: String, domain: Bool) {
+    public func toggleUrl(url: String, domain: Bool) {
         do {
             try self.engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
         } catch let error as NSError {
