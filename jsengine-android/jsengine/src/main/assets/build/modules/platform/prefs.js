@@ -16,7 +16,11 @@ System.register('platform/prefs', [], function (_export) {
   }
 
   function getPref(prefKey, defaultValue) {
-    return prefs[prefKey] || defaultValue;
+    if (prefs[prefKey] !== undefined) {
+      return prefs[prefKey];
+    } else {
+      return defaultValue;
+    }
   }
 
   function setPref(prefKey, value) {
@@ -51,8 +55,8 @@ System.register('platform/prefs', [], function (_export) {
 
       // load prefs from file
       fs.readFile(PREFS_FILE, function (data) {
-        // merge prefs with defaults
         prefs = JSON.parse(data || '{}');
+        // merge with default prefs
         Object.keys(defaultPrefs).forEach(function (pref) {
           if (prefs[pref] === undefined) {
             prefs[pref] = defaultPrefs[pref];
