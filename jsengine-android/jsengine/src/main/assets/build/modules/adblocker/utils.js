@@ -3,7 +3,7 @@ System.register('adblocker/utils', ['adblocker/adblocker'], function (_export) {
 
   var CliqzADB;
 
-  _export('log', log);
+  _export('default', log);
 
   function log(msg) {
     var message = '[adblock] ' + msg;
