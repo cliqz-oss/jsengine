@@ -25,7 +25,7 @@ System.register("adblocker/filters-matching", [], function (_export) {
       // - If more than one policy type is valid, we must find at least one
       // - If we found a blacklisted policy type we can return `false`
       var foundValidCP = null;
-      for (var i = 0; i < options.length; i++) {
+      for (var i = 0; i < options.length; i += 1) {
         var _options$i = _slicedToArray(options[i], 2);
 
         var option = _options$i[0];
@@ -77,12 +77,12 @@ System.register("adblocker/filters-matching", [], function (_export) {
     }
 
     // URL must be among these domains to match
-    if (filter.optDomains !== null && !(filter.optDomains.has(sHostGD) || filter.optDomains.has(sHost))) {
+    if (filter.optDomains.size > 0 && !(filter.optDomains.has(sHostGD) || filter.optDomains.has(sHost))) {
       return false;
     }
 
     // URL must not be among these domains to match
-    if (filter.optNotDomains !== null && (filter.optNotDomains.has(sHostGD) || filter.optNotDomains.has(sHost))) {
+    if (filter.optNotDomains.size > 0 && (filter.optNotDomains.has(sHostGD) || filter.optNotDomains.has(sHost))) {
       return false;
     }
 
@@ -110,9 +110,9 @@ System.register("adblocker/filters-matching", [], function (_export) {
         } else if (filter.isRightAnchor) {
           // If it's a right anchor, then the filterStr should match exactly
           return urlPattern === filter.filterStr;
-        } else {
-          return urlPattern.startsWith(filter.filterStr);
         }
+
+        return urlPattern.startsWith(filter.filterStr);
       }
     } else {
       if (filter.isRegex) {
@@ -132,15 +132,11 @@ System.register("adblocker/filters-matching", [], function (_export) {
   }
 
   function matchNetworkFilter(filter, request) {
-    if (filter.supported) {
-      if (!checkOptions(filter, request)) {
-        return false;
-      }
-
-      return checkPattern(filter, request);
+    if (!checkOptions(filter, request)) {
+      return false;
     }
 
-    return false;
+    return checkPattern(filter, request);
   }
 
   function checkHostnamesPartialMatch(hostname, hostnamePattern) {
@@ -185,9 +181,9 @@ System.register("adblocker/filters-matching", [], function (_export) {
   }
 
   function matchHostnames(hostname, hostnames) {
-    // TODO: Do we want to return `true` when there is no hostname constraint?
-    if (!hostnames) {
-      return false;
+    // If there is no constraint, then this is a match
+    if (hostnames.length === 0) {
+      return true;
     }
 
     var _iteratorNormalCompletion = true;
@@ -221,15 +217,15 @@ System.register("adblocker/filters-matching", [], function (_export) {
   }
 
   function matchCosmeticFilter(filter, hostname) {
-    if (filter.supported) {
-      if (filter.hostnames && hostname) {
-        return matchHostnames(hostname, filter.hostnames);
-      }
+    var result = false;
 
-      return true;
+    if (filter.hostnames.length > 0 && hostname) {
+      result = matchHostnames(hostname, filter.hostnames);
+    } else {
+      result = true;
     }
 
-    return false;
+    return result;
   }
 
   return {
