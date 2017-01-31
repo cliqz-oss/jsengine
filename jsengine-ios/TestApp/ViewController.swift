@@ -10,7 +10,7 @@ import UIKit
 import jsengine
 
 class ViewController: UIViewController {
-    let x = Engine()
+    let x = Engine(bundle: NSBundle.mainBundle())
     override func viewDidLoad() {
         super.viewDidLoad()
         

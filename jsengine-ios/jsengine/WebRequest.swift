@@ -9,7 +9,7 @@ import UIKit
 import WebKit
 import JavaScriptCore
 
-class WebRequest {
+public class WebRequest {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
     
@@ -46,10 +46,20 @@ class WebRequest {
         tabs.setObject(webView, forKey: NSNumber(integer: tabId))
     }
     
-    //MARK: - Private Methods
-    private func isTabActive(tabId: Int) -> Bool {
+    func getUrlForTab(tabId: Int) -> String? {
+        if self.isTabActive(tabId) {
+            if let webView = tabs.objectForKey(tabId) as? UIWebView {
+                return webView.request?.URL?.absoluteString
+            }
+        }
+        return nil
+    }
+    
+    func isTabActive(tabId: Int) -> Bool {
         return tabs.objectForKey(tabId) != nil
     }
+    
+    //MARK: - Private Methods
     
     private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
         
@@ -86,7 +96,7 @@ class WebRequest {
         return requestInfo
     }
     
-    private func generateUniqueUserAgent(baseUserAgent: String, tabId: Int) -> String {
+    public class func generateUniqueUserAgent(baseUserAgent: String, tabId: Int) -> String {
         let uniqueUserAgent = baseUserAgent + String(format:" _id/%06d", tabId)
         return uniqueUserAgent
     }

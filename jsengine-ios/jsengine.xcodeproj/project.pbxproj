@@ -10,7 +10,21 @@
 		860373B81E043C1200749750 /* ContentPolicyDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B41E043C1200749750 /* ContentPolicyDetector.swift */; };
 		860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B51E043C1200749750 /* InterceptorURLProtocol.swift */; };
 		860373BA1E043C1200749750 /* WebRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373B61E043C1200749750 /* WebRequest.swift */; };
+		860373BE1E08169800749750 /* SystemLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373BD1E08169800749750 /* SystemLoader.swift */; };
+		86173C151E1A7E1400015F5B /* PromiseCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86173C141E1A7E1400015F5B /* PromiseCallback.swift */; };
+		865D9A151E291E3C00B82F81 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 865D9A141E291E3B00B82F81 /* assets */; };
+		865D9A161E291E6800B82F81 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 865D9A141E291E3B00B82F81 /* assets */; };
+		864134B41E3238490019683D /* AdblockerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864134B31E3238490019683D /* AdblockerTest.swift */; };
+		865D9A181E292C1000B82F81 /* AntiTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A171E292C1000B82F81 /* AntiTracking.swift */; };
+		865D9A1A1E2CCFAF00B82F81 /* Adblocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A191E2CCFAF00B82F81 /* Adblocker.swift */; };
+		865D9A1C1E2E1E3E00B82F81 /* CryptoTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A1B1E2E1E3E00B82F81 /* CryptoTest.swift */; };
+		865D9A201E2E2E9100B82F81 /* FileIOTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A1F1E2E2E9100B82F81 /* FileIOTest.swift */; };
+		865D9A221E2E57F900B82F81 /* HttpHandlerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A211E2E57F900B82F81 /* HttpHandlerTest.swift */; };
+		866528011E2F793E0044048E /* SystemLoaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866528001E2F793E0044048E /* SystemLoaderTest.swift */; };
+		8665280D1E30FDB40044048E /* EngineTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8665280C1E30FDB40044048E /* EngineTest.swift */; };
+		8665280F1E310E820044048E /* AntiTrackingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8665280E1E310E810044048E /* AntiTrackingTest.swift */; };
 		8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8669E2371DFAE7D600B6D9F1 /* Crypto.swift */; };
+		86CF915A1E26355800AAB46B /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86CF91591E26355800AAB46B /* DebugLogger.swift */; };
 		B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041C51DF84EAB004F9E14 /* Engine.swift */; };
 		B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041CF1DF85071004F9E14 /* JSConsole.swift */; };
 		B30041D81DF86206004F9E14 /* UITest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30041D71DF86206004F9E14 /* UITest.swift */; };
@@ -32,6 +46,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		865D9A1D1E2E28D700B82F81 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B3CEA5C01DF6CA0000880EF8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B30041E01DF8639C004F9E14;
+			remoteInfo = TestApp;
+		};
 		B30041F51DF8639C004F9E14 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B3CEA5C01DF6CA0000880EF8 /* Project object */;
@@ -59,7 +80,20 @@
 		860373B41E043C1200749750 /* ContentPolicyDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentPolicyDetector.swift; sourceTree = "<group>"; };
 		860373B51E043C1200749750 /* InterceptorURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterceptorURLProtocol.swift; sourceTree = "<group>"; };
 		860373B61E043C1200749750 /* WebRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebRequest.swift; sourceTree = "<group>"; };
+		860373BD1E08169800749750 /* SystemLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemLoader.swift; sourceTree = "<group>"; };
+		86173C141E1A7E1400015F5B /* PromiseCallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseCallback.swift; sourceTree = "<group>"; };
+		865D9A141E291E3B00B82F81 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = "../../jsengine-android/jsengine/src/main/assets"; sourceTree = "<group>"; };
+		864134B31E3238490019683D /* AdblockerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdblockerTest.swift; sourceTree = "<group>"; };
+		865D9A171E292C1000B82F81 /* AntiTracking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AntiTracking.swift; sourceTree = "<group>"; };
+		865D9A191E2CCFAF00B82F81 /* Adblocker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Adblocker.swift; sourceTree = "<group>"; };
+		865D9A1B1E2E1E3E00B82F81 /* CryptoTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoTest.swift; sourceTree = "<group>"; };
+		865D9A1F1E2E2E9100B82F81 /* FileIOTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileIOTest.swift; sourceTree = "<group>"; };
+		865D9A211E2E57F900B82F81 /* HttpHandlerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpHandlerTest.swift; sourceTree = "<group>"; };
+		866528001E2F793E0044048E /* SystemLoaderTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemLoaderTest.swift; sourceTree = "<group>"; };
+		8665280C1E30FDB40044048E /* EngineTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EngineTest.swift; sourceTree = "<group>"; };
+		8665280E1E310E810044048E /* AntiTrackingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AntiTrackingTest.swift; sourceTree = "<group>"; };
 		8669E2371DFAE7D600B6D9F1 /* Crypto.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Crypto.swift; sourceTree = "<group>"; };
+		86CF91591E26355800AAB46B /* DebugLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
 		B30041C51DF84EAB004F9E14 /* Engine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Engine.swift; sourceTree = "<group>"; };
 		B30041CF1DF85071004F9E14 /* JSConsole.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSConsole.swift; sourceTree = "<group>"; };
 		B30041D51DF86206004F9E14 /* UITest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UITest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -217,8 +251,12 @@
 		B3CEA5CB1DF6CA0000880EF8 /* jsengine */ = {
 			isa = PBXGroup;
 			children = (
+				865D9A141E291E3B00B82F81 /* assets */,
 				B30042201DF86B04004F9E14 /* ThirdParty */,
 				B30041C51DF84EAB004F9E14 /* Engine.swift */,
+				865D9A171E292C1000B82F81 /* AntiTracking.swift */,
+				865D9A191E2CCFAF00B82F81 /* Adblocker.swift */,
+				860373BD1E08169800749750 /* SystemLoader.swift */,
 				B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */,
 				B30042151DF867B5004F9E14 /* FileIO.swift */,
 				8669E2371DFAE7D600B6D9F1 /* Crypto.swift */,
@@ -229,6 +267,8 @@
 				860373B51E043C1200749750 /* InterceptorURLProtocol.swift */,
 				B3CEA5CD1DF6CA0000880EF8 /* Info.plist */,
 				B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */,
+				86173C141E1A7E1400015F5B /* PromiseCallback.swift */,
+				86CF91591E26355800AAB46B /* DebugLogger.swift */,
 			);
 			path = jsengine;
 			sourceTree = "<group>";
@@ -238,6 +278,13 @@
 			children = (
 				B3CEA5D71DF6CA0000880EF8 /* jsengineTests.swift */,
 				B3CEA5D91DF6CA0000880EF8 /* Info.plist */,
+				865D9A1B1E2E1E3E00B82F81 /* CryptoTest.swift */,
+				865D9A1F1E2E2E9100B82F81 /* FileIOTest.swift */,
+				865D9A211E2E57F900B82F81 /* HttpHandlerTest.swift */,
+				866528001E2F793E0044048E /* SystemLoaderTest.swift */,
+				8665280C1E30FDB40044048E /* EngineTest.swift */,
+				8665280E1E310E810044048E /* AntiTrackingTest.swift */,
+				864134B31E3238490019683D /* AdblockerTest.swift */,
 			);
 			path = jsengineTests;
 			sourceTree = "<group>";
@@ -356,6 +403,7 @@
 			);
 			dependencies = (
 				B3CEA5D51DF6CA0000880EF8 /* PBXTargetDependency */,
+				865D9A1E1E2E28D700B82F81 /* PBXTargetDependency */,
 			);
 			name = jsengineTests;
 			productName = jsengineTests;
@@ -443,6 +491,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B30041EE1DF8639C004F9E14 /* LaunchScreen.storyboard in Resources */,
+				865D9A161E291E6800B82F81 /* assets in Resources */,
 				B30041EB1DF8639C004F9E14 /* Assets.xcassets in Resources */,
 				B30041E91DF8639C004F9E14 /* Main.storyboard in Resources */,
 			);
@@ -466,6 +515,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				865D9A151E291E3C00B82F81 /* assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -516,13 +566,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				865D9A181E292C1000B82F81 /* AntiTracking.swift in Sources */,
 				860373B81E043C1200749750 /* ContentPolicyDetector.swift in Sources */,
 				B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */,
+				860373BE1E08169800749750 /* SystemLoader.swift in Sources */,
+				86CF915A1E26355800AAB46B /* DebugLogger.swift in Sources */,
+				865D9A1A1E2CCFAF00B82F81 /* Adblocker.swift in Sources */,
 				860373BA1E043C1200749750 /* WebRequest.swift in Sources */,
 				860373B91E043C1200749750 /* InterceptorURLProtocol.swift in Sources */,
 				B30042161DF867B5004F9E14 /* FileIO.swift in Sources */,
 				B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */,
 				8669E2381DFAE7D600B6D9F1 /* Crypto.swift in Sources */,
+				86173C151E1A7E1400015F5B /* PromiseCallback.swift in Sources */,
 				B30041D01DF85071004F9E14 /* JSConsole.swift in Sources */,
 				B30041C61DF84EAB004F9E14 /* Engine.swift in Sources */,
 				B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */,
@@ -533,13 +588,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				865D9A1C1E2E1E3E00B82F81 /* CryptoTest.swift in Sources */,
+				865D9A201E2E2E9100B82F81 /* FileIOTest.swift in Sources */,
+				865D9A221E2E57F900B82F81 /* HttpHandlerTest.swift in Sources */,
+				8665280F1E310E820044048E /* AntiTrackingTest.swift in Sources */,
+				8665280D1E30FDB40044048E /* EngineTest.swift in Sources */,
+				864134B41E3238490019683D /* AdblockerTest.swift in Sources */,
 				B3CEA5D81DF6CA0000880EF8 /* jsengineTests.swift in Sources */,
+				866528011E2F793E0044048E /* SystemLoaderTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		865D9A1E1E2E28D700B82F81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B30041E01DF8639C004F9E14 /* TestApp */;
+			targetProxy = 865D9A1D1E2E28D700B82F81 /* PBXContainerItemProxy */;
+		};
 		B30041F61DF8639C004F9E14 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B30041E01DF8639C004F9E14 /* TestApp */;
@@ -607,6 +674,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -621,6 +689,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.TestApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -632,14 +701,13 @@
 		B300420A1DF8639C004F9E14 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestAppTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.TestAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestApp.app/TestApp";
 			};
 			name = Debug;
@@ -647,14 +715,13 @@
 		B300420B1DF8639C004F9E14 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestAppTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.TestAppTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestApp.app/TestApp";
 			};
 			name = Release;
@@ -662,7 +729,6 @@
 		B300420D1DF8639C004F9E14 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestAppUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -676,7 +742,6 @@
 		B300420E1DF8639C004F9E14 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				DEVELOPMENT_TEAM = 2UYYSSHVUH;
 				INFOPLIST_FILE = TestAppUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -798,6 +863,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = jsengine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.jsengine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -820,6 +886,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = jsengine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.jsengine;
 				PRODUCT_NAME = "$(TARGET_NAME)";

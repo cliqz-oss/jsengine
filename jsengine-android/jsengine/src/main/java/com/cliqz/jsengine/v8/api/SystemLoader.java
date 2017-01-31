@@ -364,6 +364,28 @@ public class SystemLoader {
         }
     }
 
+    private Object _callFunctionOnModuleAttribute(final String modulePath, final String[] attribute, final String functionName, final Object... args) throws ExecutionException {
+        final int depth = attribute.length;
+        V8Object[] objStack = new V8Object[depth + 1];
+        try {
+            final V8Object module = loadModuleInternal(modulePath);
+            objStack[0] = module;
+            for (int i=0; i<depth; i++) {
+                objStack[i+1] = objStack[i].getObject(attribute[i]);
+            }
+            return objStack[depth].executeJSFunction(functionName, args);
+        } catch (ExecutionException e) {
+            throw new QueryException(e);
+        } finally {
+            // module release is handled by loadModuleInternal
+            for (int i=1; i<depth + 1; i++) {
+                if (objStack[i] != null) {
+                    objStack[i].release();
+                }
+            }
+        }
+    }
+
     private Object callFunctionOnObject(final V8Object obj, final String functionName, final Object... args) {
         // check if this is a valid function name
         final Object fnResult = obj.executeJSFunction(functionName, args);
