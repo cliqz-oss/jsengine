@@ -34,7 +34,6 @@ public class HttpHandler {
 
     final V8Engine engine;
     private final HttpRequestPolicy policy;
-    final ExecutorService asyncExecutor = Executors.newCachedThreadPool();
     private boolean shutdownRequested = false;
 
     public HttpHandler(final V8Engine engine, HttpRequestPolicy policy) throws JSApiException {
@@ -57,12 +56,6 @@ public class HttpHandler {
             @Override
             public Object query(V8 runtime) {
                 shutdownRequested = true;
-                asyncExecutor.shutdown();
-                try {
-                    asyncExecutor.awaitTermination(10000, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
                 return null;
             }
         });
@@ -84,13 +77,15 @@ public class HttpHandler {
         // keep a handle on the callbacks
         final V8Function successCallback = (V8Function) callback.twin();
         final V8Function errorCallback = (V8Function) onerror.twin();
+        callback.release();
+        onerror.release();
 
         if (!isHttpRequestPermitted(requestedUrl)) {
             doErrorCallback(successCallback, errorCallback);
             return false;
         }
 
-        asyncExecutor.submit(new Runnable() {
+        this.engine.getWorker().submit(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -101,6 +96,8 @@ public class HttpHandler {
                     // otherwise promise chains will be broken and memory can be leaked
                     doErrorCallback(successCallback, errorCallback);
                     Log.e(TAG, "Failed making Http request", e);
+                } finally {
+                    releaseObjects(successCallback, errorCallback);
                 }
             }
         });
@@ -130,8 +127,6 @@ public class HttpHandler {
                         responseObject.add("response", resp.response);
                         successCallback.call(successCallback, callbackArgs.push(responseObject));
                     } finally {
-                        successCallback.release();
-                        errorCallback.release();
                         responseObject.release();
                         callbackArgs.release();
                     }
@@ -147,12 +142,7 @@ public class HttpHandler {
         try {
             engine.asyncQuery(new V8Engine.Query<Object>() {
                 public Object query(V8 context) {
-                    try {
-                        errorCallback.call(errorCallback, null);
-                    } finally {
-                        successCallback.release();
-                        errorCallback.release();
-                    }
+                    errorCallback.call(errorCallback, null);
                     return null;
                 }
             });
@@ -195,12 +185,31 @@ public class HttpHandler {
                     responseData.append("\n");
                 }
             }
+
         } finally {
             httpURLConnection.disconnect();
         }
 
         responseCode = httpURLConnection.getResponseCode();
         return new HttpResponse(responseCode, responseData.toString());
+    }
+
+    void releaseObjects(final V8Object... objects) {
+        try {
+            engine.asyncQuery(new V8Engine.Query<Void>() {
+                @Override
+                public Void query(V8 runtime) {
+                    for (V8Object obj : objects) {
+                        if (!obj.isReleased()) {
+                            obj.release();
+                        }
+                    }
+                    return null;
+                }
+            });
+        } catch(InterruptedException | ExecutionException e) {
+            Log.e(TAG, "Error releasing objects", e);
+        }
     }
 
 }

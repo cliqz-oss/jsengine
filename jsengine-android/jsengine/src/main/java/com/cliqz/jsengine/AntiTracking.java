@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by sammacbeth on 21/10/2016.
@@ -33,11 +34,25 @@ public class AntiTracking {
         this.webRequest = engine.webRequest;
     }
 
-    public Map<String, Object> getDefaultPrefs() {
+    /**
+     * Get the default prefs to initialise the antitracking module in enabled state
+     * @return
+     */
+    public static Map<String, Object> getDefaultPrefs() {
+        return getDefaultPrefs(true);
+    }
+
+    /**
+     * Get the default prefs to initialise the antitracking module
+     * @param enabled
+     * @return
+     */
+    public static Map<String, Object> getDefaultPrefs(final boolean enabled) {
         final Map<String, Object> prefs = new HashMap<>();
         prefs.put(BLOOM_FILTER_PREF, true);
-        prefs.put(ENABLE_PREF, true);
+        prefs.put(ENABLE_PREF, enabled);
         prefs.put(QSBLOCKING_PREF, true);
+        prefs.put(FORCE_BLOCK_PREF, true);
         return prefs;
     }
 
@@ -68,10 +83,12 @@ public class AntiTracking {
 
     public boolean isWhitelisted(final String url) {
         try {
-            final Object whitelisted = engine.system.callFunctionOnModuleDefault(MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
+            final Object whitelisted = engine.system.callFunctionOnModuleDefault(50, MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
             return whitelisted.equals(Boolean.TRUE);
         } catch (ExecutionException e) {
             Log.e(TAG, "isWhitelisted", e);
+        } catch (TimeoutException e) {
+            return true;
         }
         return false;
     }

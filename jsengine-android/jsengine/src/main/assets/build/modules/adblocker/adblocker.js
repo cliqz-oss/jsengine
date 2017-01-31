@@ -3,18 +3,13 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
   // import CliqzHumanWeb from 'human-web/human-web';
   'use strict';
 
-  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzHumanWeb, CliqzUtils, SERIALIZED_ENGINE_PATH, ADB_VER, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
+  var utils, events, WebRequest, URLInfo, getGeneralDomain, browser, LazyPersistentObject, LRUCache, HttpRequestContext, _log, FilterEngine, serializeFiltersEngine, deserializeFiltersEngine, FiltersLoader, AdbStats, Resource, CliqzUtils, CliqzHumanWeb, SERIALIZED_ENGINE_PATH, ADB_VERSION, ADB_DISK_CACHE, ADB_PREF, ADB_PREF_OPTIMIZED, ADB_ABTEST_PREF, ADB_PREF_VALUES, ADB_DEFAULT_VALUE, AdBlocker, CliqzADB;
 
   var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   _export('autoBlockAds', autoBlockAds);
 
   _export('adbABTestEnabled', adbABTestEnabled);
-
-  /* Wraps filter-based adblocking in a class. It has to handle both
-   * the management of lists (fetching, updating) using a FiltersLoader
-   * and the matching using a FilterEngine.
-   */
 
   _export('adbEnabled', adbEnabled);
 
@@ -37,6 +32,20 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
     return adbABTestEnabled() && CliqzUtils.getPref(ADB_PREF, ADB_PREF_VALUES.Disabled) !== 0;
   }
 
+  function extractGeneralDomain(uri) {
+    var url = uri.toLowerCase();
+    var urlParts = URLInfo.get(url);
+    var hostname = urlParts.hostname;
+    if (hostname.startsWith('www.')) {
+      hostname = hostname.substring(4);
+    }
+    return getGeneralDomain(hostname);
+  }
+
+  /* Wraps filter-based adblocking in a class. It has to handle both
+   * the management of lists (fetching, updating) using a FiltersLoader
+   * and the matching using a FilterEngine.
+   */
   return {
     setters: [function (_coreCliqz) {
       utils = _coreCliqz.utils;
@@ -56,7 +65,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
     }, function (_antitrackingWebrequestContext) {
       HttpRequestContext = _antitrackingWebrequestContext['default'];
     }, function (_adblockerUtils) {
-      log = _adblockerUtils.log;
+      _log = _adblockerUtils['default'];
     }, function (_adblockerFiltersEngine) {
       FilterEngine = _adblockerFiltersEngine['default'];
       serializeFiltersEngine = _adblockerFiltersEngine.serializeFiltersEngine;
@@ -69,18 +78,22 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
       Resource = _coreResourceLoader.Resource;
     }],
     execute: function () {
-      CliqzHumanWeb = undefined;
       CliqzUtils = utils;
+      CliqzHumanWeb = undefined;
 
       // Disk persisting
       SERIALIZED_ENGINE_PATH = ['antitracking', 'adblocking', 'engine.json'];
 
       // adb version
-      ADB_VER = 0.01;
+      ADB_VERSION = 2;
 
-      _export('ADB_VER', ADB_VER);
+      _export('ADB_VERSION', ADB_VERSION);
 
       // Preferences
+      ADB_DISK_CACHE = 'cliqz-adb-disk-cache';
+
+      _export('ADB_DISK_CACHE', ADB_DISK_CACHE);
+
       ADB_PREF = 'cliqz-adb';
 
       _export('ADB_PREF', ADB_PREF);
@@ -105,11 +118,12 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
       _export('ADB_DEFAULT_VALUE', ADB_DEFAULT_VALUE);
 
       AdBlocker = (function () {
-        function AdBlocker() {
+        function AdBlocker(onDiskCache) {
           var _this = this;
 
           _classCallCheck(this, AdBlocker);
 
+          this.onDiskCache = onDiskCache;
           this.logs = [];
           this.engine = new FilterEngine();
 
@@ -163,26 +177,27 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             _this.initCache();
 
             // Serialize new version of the engine on disk if needed
-            if (_this.engine.updated) {
-              (function () {
-                var t0 = Date.now();
-                new Resource(SERIALIZED_ENGINE_PATH).persist(JSON.stringify(serializeFiltersEngine(_this.engine))).then(function () {
-                  var totalTime = Date.now() - t0;
-                  _this.log('Serialized filters engine on disk (' + totalTime + ' ms)');
-                  _this.engine.updated = false;
-                });
-              })();
-            } else {
-              _this.log('Engine has not been updated, do not serialize');
+            if (_this.onDiskCache) {
+              if (_this.engine.updated) {
+                (function () {
+                  var t0 = Date.now();
+                  new Resource(SERIALIZED_ENGINE_PATH).persist(JSON.stringify(serializeFiltersEngine(_this.engine, ADB_VERSION))).then(function () {
+                    var totalTime = Date.now() - t0;
+                    _this.log('Serialized filters engine on disk (' + totalTime + ' ms)');
+                    _this.engine.updated = false;
+                  })['catch'](function (e) {
+                    _this.log('Failed to serialize filters engine on disk ' + e);
+                  });
+                })();
+              } else {
+                _this.log('Engine has not been updated, do not serialize');
+              }
             }
           });
 
           // Blacklists to disable adblocking on certain domains/urls
           this.blacklist = new Set();
           this.blacklistPersist = new LazyPersistentObject('adb-blacklist');
-
-          // Is the adblocker initialized
-          this.initialized = false;
         }
 
         _createClass(AdBlocker, [{
@@ -191,7 +206,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             var date = new Date();
             var message = date.getHours() + ':' + date.getMinutes() + ' ' + msg;
             this.logs.push(message);
-            CliqzUtils.log(msg, 'adblocker');
+            _log(msg, 'adblocker');
           }
         }, {
           key: 'initCache',
@@ -206,57 +221,68 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             1000, // Maximum number of entries
             function (request) {
               return request.sourceGD + request.url;
-            } // Select key
-            );
+            });
+          }
+        }, {
+          key: 'loadEngineFromDisk',
+          // Select key
+          value: function loadEngineFromDisk() {
+            var _this2 = this;
+
+            if (this.onDiskCache) {
+              return new Resource(SERIALIZED_ENGINE_PATH).load().then(function (serializedEngine) {
+                if (serializedEngine !== undefined) {
+                  try {
+                    var t0 = Date.now();
+                    deserializeFiltersEngine(_this2.engine, serializedEngine, ADB_VERSION);
+                    var totalTime = Date.now() - t0;
+                    _this2.log('Loaded filters engine from disk (' + totalTime + ' ms)');
+                  } catch (e) {
+                    // In case there is a mismatch between the version of the code
+                    // and the serialization format of the engine on disk, we might
+                    // not be able to load the engine from disk. Then we just start
+                    // fresh!
+                    _this2.engine = new FilterEngine();
+                    _this2.log('Exception while loading engine from disk ' + e + ' ' + e.stack);
+                  }
+                } else {
+                  _this2.log('No filter engine was serialized on disk');
+                }
+              })['catch'](function () {
+                _this2.log('No engine on disk', 'adblocker');
+              });
+            }
+
+            return Promise.resolve();
           }
         }, {
           key: 'init',
           value: function init() {
-            var _this2 = this;
+            var _this3 = this;
 
             this.initCache();
 
-            // Load serialized engine from disk, then init filters manager
-            new Resource(SERIALIZED_ENGINE_PATH).load().then(function (serializedEngine) {
-              if (serializedEngine !== undefined) {
-                try {
-                  var t0 = Date.now();
-                  deserializeFiltersEngine(_this2.engine, serializedEngine);
-                  var totalTime = Date.now() - t0;
-                  _this2.log('Loaded filters engine from disk (' + totalTime + ' ms)');
-                } catch (e) {
-                  // In case there is a mismatch between the version of the code
-                  // and the serialization format of the engine on disk, we might
-                  // not be able to load the engine from disk. Then we just start
-                  // fresh!
-                  _this2.engine = new FilterEngine();
-                  _this2.log('Exception while loading engine from disk ' + e + ' ' + e.stack);
-                }
-              } else {
-                _this2.log('No filter engine was serialized on disk');
-              }
-
-              // Load files from disk, then check if we should update
-              _this2.listsManager.load().then(function () {
-                // Update check should be performed after a short while
-                _this2.log('Check for updates');
-                setTimeout(function () {
-                  return _this2.listsManager.update();
-                }, 30 * 1000);
-              });
-            });
-
-            this.blacklistPersist.load().then(function (value) {
+            return this.blacklistPersist.load().then(function (value) {
               // Set value
               if (value.urls !== undefined) {
-                _this2.blacklist = new Set(value.urls);
+                _this3.blacklist = new Set(value.urls);
               }
+            }).then(function () {
+              return _this3.loadEngineFromDisk();
+            }).then(function () {
+              return _this3.listsManager.load();
+            }).then(function () {
+              // Update check should be performed after a short while
+              _this3.log('Check for updates');
+              _this3.loadingTimer = utils.setTimeout(function () {
+                return _this3.listsManager.update();
+              }, 30 * 1000);
             });
-            this.initialized = true;
           }
         }, {
           key: 'unload',
           value: function unload() {
+            utils.clearTimeout(this.loadingTimer);
             this.listsManager.stop();
           }
         }, {
@@ -279,20 +305,18 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
         }, {
           key: 'isInBlacklist',
           value: function isInBlacklist(request) {
-            return this.blacklist.has(request.sourceURL) || this.blacklist.has(request.sourceGD);
+            return this.isUrlInBlacklist(request.sourceURL) || this.blacklist.has(request.sourceGD);
           }
         }, {
           key: 'isDomainInBlacklist',
           value: function isDomainInBlacklist(url) {
             // Should all this domain stuff be extracted into a function?
             // Why is CliqzUtils.detDetailsFromUrl not used?
-            if (!utils.isUrl(url)) {
-              return false;
-            }
-            var urlParts = URLInfo.get(url);
-            var hostname = urlParts.hostname || url;
-            if (hostname.startsWith('www.')) {
-              hostname = hostname.substring(4);
+            var hostname = url;
+            try {
+              hostname = extractGeneralDomain(url);
+            } catch (e) {
+              // In case of ill-formed URL, just do a normal loopup
             }
 
             return this.blacklist.has(hostname);
@@ -300,7 +324,8 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
         }, {
           key: 'isUrlInBlacklist',
           value: function isUrlInBlacklist(url) {
-            return this.blacklist.has(url);
+            var processedURL = utils.cleanUrlProtocol(url, true);
+            return this.blacklist.has(processedURL);
           }
         }, {
           key: 'logActionHW',
@@ -319,14 +344,15 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
           value: function toggleUrl(url, domain) {
             var processedURL = url;
             if (domain) {
-              // Should all this domain stuff be extracted into a function?
-              // Why is CliqzUtils.getDetailsFromUrl not used?
-              if (utils.isUrl(processedURL)) {
-                processedURL = URLInfo.get(url).hostname;
+              try {
+                processedURL = extractGeneralDomain(processedURL);
+              } catch (e) {
+                // If there is no general domain to be extracted, it means the URL is
+                // not correct. Hence we can just ignore it. (eg: about:config).
+                return;
               }
-              if (processedURL.startsWith('www.')) {
-                processedURL = processedURL.substring(4);
-              }
+            } else {
+              processedURL = utils.cleanUrlProtocol(processedURL, true);
             }
 
             var existHW = CliqzHumanWeb && CliqzHumanWeb.state.v[url];
@@ -351,11 +377,6 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
         }, {
           key: 'match',
           value: function match(httpContext) {
-            // Check if the adblocker is initialized
-            if (!this.initialized) {
-              return false;
-            }
-
             if (httpContext.isFullPage()) {
               // allow loading document
               return false;
@@ -403,7 +424,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             var isAd = this.isInBlacklist(request) ? { match: false } : this.cache.get(request);
             var totalTime = Date.now() - t0;
 
-            log('BLOCK AD ' + JSON.stringify({
+            console.log('BLOCK AD ' + JSON.stringify({
               timeAdFilter: totalTime,
               isAdFilter: isAd,
               context: {
@@ -422,6 +443,7 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
       })();
 
       CliqzADB = {
+        onDiskCache: CliqzUtils.getPref(ADB_DISK_CACHE, true),
         adblockInitialized: false,
         adbMem: {},
         adbStats: new AdbStats(),
@@ -436,25 +458,27 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             CliqzUtils.setPref(ADB_PREF, ADB_PREF_VALUES.Disabled);
           }
 
-          CliqzADB.adBlocker = new AdBlocker();
+          CliqzADB.adBlocker = new AdBlocker(CliqzADB.onDiskCache);
 
           var initAdBlocker = function initAdBlocker() {
-            CliqzADB.adBlocker.init();
-            CliqzADB.adblockInitialized = true;
-            CliqzADB.initPacemaker();
-            WebRequest.onBeforeRequest.addListener(CliqzADB.httpopenObserver.observe, undefined, ['blocking']);
+            return CliqzADB.adBlocker.init().then(function () {
+              CliqzADB.adblockInitialized = true;
+              CliqzADB.initPacemaker();
+              WebRequest.onBeforeRequest.addListener(CliqzADB.httpopenObserver.observe, undefined, ['blocking']);
+            });
           };
 
           if (adbEnabled()) {
-            initAdBlocker();
-          } else {
-            this.onPrefChangeEvent = events.subscribe('prefchange', function (pref) {
-              if ((pref === ADB_PREF || pref === ADB_ABTEST_PREF) && !CliqzADB.adblockInitialized && adbEnabled()) {
-                // FIXME
-                initAdBlocker();
-              }
-            });
+            return initAdBlocker();
           }
+
+          this.onPrefChangeEvent = events.subscribe('prefchange', function (pref) {
+            if ((pref === ADB_PREF || pref === ADB_ABTEST_PREF) && !CliqzADB.adblockInitialized && adbEnabled()) {
+              // FIXME
+              initAdBlocker();
+            }
+          });
+          return Promise.resolve();
         },
 
         unload: function unload() {
@@ -465,13 +489,8 @@ System.register('adblocker/adblocker', ['core/cliqz', 'core/webrequest', 'antitr
             this.onPrefChangeEvent.unsubscribe();
           }
           CliqzADB.unloadPacemaker();
-          browser.forEachWindow(CliqzADB.unloadWindow);
           WebRequest.onBeforeRequest.removeListener(CliqzADB.httpopenObserver.observe);
         },
-
-        initWindow: function initWindow() /* window */{},
-
-        unloadWindow: function unloadWindow() /* window */{},
 
         initPacemaker: function initPacemaker() {
           var t1 = utils.setInterval(function () {

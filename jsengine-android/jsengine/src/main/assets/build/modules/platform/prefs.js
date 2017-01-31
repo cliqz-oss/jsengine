@@ -1,7 +1,7 @@
 System.register('platform/prefs', [], function (_export) {
   'use strict';
 
-  var PREFS_FILE, prefs;
+  var PREFS_FILE, defaultPrefs, prefs;
 
   _export('getPref', getPref);
 
@@ -16,7 +16,11 @@ System.register('platform/prefs', [], function (_export) {
   }
 
   function getPref(prefKey, defaultValue) {
-    return prefs[prefKey] || defaultValue;
+    if (prefs[prefKey] !== undefined) {
+      return prefs[prefKey];
+    } else {
+      return defaultValue;
+    }
   }
 
   function setPref(prefKey, value) {
@@ -46,11 +50,18 @@ System.register('platform/prefs', [], function (_export) {
       PREFS_FILE = 'cliqz.prefs.json';
 
       // default prefs
-      prefs = __DEFAULTPREFS__ || {};
+      defaultPrefs = __DEFAULTPREFS__ || {};
+      prefs = defaultPrefs;
 
       // load prefs from file
       fs.readFile(PREFS_FILE, function (data) {
         prefs = JSON.parse(data || '{}');
+        // merge with default prefs
+        Object.keys(defaultPrefs).forEach(function (pref) {
+          if (prefs[pref] === undefined) {
+            prefs[pref] = defaultPrefs[pref];
+          }
+        });
       });
     }
   };

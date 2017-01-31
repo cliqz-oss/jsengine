@@ -115,7 +115,7 @@ public class WebRequest {
         }
     }
 
-    public AnnotatedWebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
+    public WebResourceResponse shouldInterceptRequest(final WebView view, final WebResourceRequest request) {
         final boolean isMainDocument = request.isForMainFrame();
         final Uri requestUrl = request.getUrl();
 
@@ -254,7 +254,7 @@ public class WebRequest {
         }
     }
 
-    private AnnotatedWebResourceResponse modifyRequest(final String decisionSource, WebResourceRequest request, String newUrlString, Map<String, String> modifyHeaders) {
+    private WebResourceResponse modifyRequest(final String decisionSource, WebResourceRequest request, String newUrlString, Map<String, String> modifyHeaders) {
         HttpURLConnection connection;
         try {
             URL newUrl = new URL(newUrlString);
@@ -272,8 +272,9 @@ public class WebRequest {
 
             Log.d(TAG, "Redirect to: "+ newUrlString);
             connection.connect();
-            final AnnotatedWebResourceResponse response = new AnnotatedWebResourceResponse(decisionSource, connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
-            response.setStatusCodeAndReasonPhrase(connection.getResponseCode(), connection.getResponseMessage());
+            final WebResourceResponse response = new WebResourceResponse(connection.getContentType(), connection.getContentEncoding(), connection.getInputStream());
+            final String reasonPhrase = decisionSource.length() > 0 ? decisionSource : connection.getResponseMessage();
+            response.setStatusCodeAndReasonPhrase(connection.getResponseCode(), reasonPhrase);
             // parse response headers
             final Map<String, String> responseHeaders = new HashMap<>();
             for (Map.Entry<String, List<String>> e : connection.getHeaderFields().entrySet()) {
@@ -292,18 +293,13 @@ public class WebRequest {
         }
     }
 
-    private AnnotatedWebResourceResponse blockRequest(final String decisionSource) {
-        return new AnnotatedWebResourceResponse(decisionSource, "text/html", "UTF-8", new ByteArrayInputStream("".getBytes()));
-    }
-
-    public class AnnotatedWebResourceResponse extends WebResourceResponse {
-
-        public final String source;
-
-        AnnotatedWebResourceResponse(String source, String mimeType, String encoding, InputStream data) {
-            super(mimeType, encoding, data);
-            this.source = source;
+    private WebResourceResponse blockRequest(String decisionSource) {
+        final WebResourceResponse response = new WebResourceResponse("text/html", "UTF-8", new ByteArrayInputStream("".getBytes()));
+        if (decisionSource.length() == 0) {
+            decisionSource = "Blocked";
         }
-
+        response.setStatusCodeAndReasonPhrase(204, decisionSource);
+        return response;
     }
+
 }

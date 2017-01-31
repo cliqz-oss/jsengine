@@ -9,6 +9,8 @@ import com.eclipsesource.v8.V8;
 import com.eclipsesource.v8.V8Array;
 import com.eclipsesource.v8.V8Object;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,19 +22,25 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class EngineTest {
 
+    private Context appContext;
+    private Engine extension;
+
+    @Before
+    public void setUp() throws Exception {
+        appContext = InstrumentationRegistry.getTargetContext();
+        extension = new Engine(appContext, true);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        extension.shutdown(true);
+    }
+
     @Test
     public void testEngineStartup() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        Engine extension = new Engine(appContext, true);
-        extension.startup();
-
-        extension.shutdown();
     }
     @Test
     public void testEngineStartupThenException() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-        Engine extension = new Engine(appContext, true);
-        extension.startup();
         try {
             V8Object result = extension.jsengine.queryEngine(new V8Engine.Query<V8Object>() {
                 @Override
@@ -51,7 +59,5 @@ public class EngineTest {
             });
             fail();
         } catch(ExecutionException e) {}
-
-        extension.shutdown();
     }
 }
