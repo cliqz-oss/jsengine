@@ -11,8 +11,6 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   _export('deserializeFiltersEngine', deserializeFiltersEngine);
 
-  function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
-
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   function tokenizeHostname(hostname) {
@@ -22,7 +20,9 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
   }
 
   function tokenizeURL(pattern) {
-    return pattern.match(/[a-zA-Z0-9]+/g) || [];
+    return (pattern.match(/[a-zA-Z0-9]+/g) || []).filter(function (token) {
+      return token.length > 1;
+    });
   }
 
   function serializeFuzzyIndex(fi, serializeBucket) {
@@ -32,16 +32,16 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     });
 
     return {
-      index: index,
-      indexOnlyOne: fi.indexOnlyOne,
-      size: fi.size
+      i: index,
+      o: fi.indexOnlyOne,
+      s: fi.size
     };
   }
 
   function deserializeFuzzyIndex(fi, serialized, deserializeBucket) {
-    var index = serialized.index;
-    var indexOnlyOne = serialized.indexOnlyOne;
-    var size = serialized.size;
+    var index = serialized.i;
+    var indexOnlyOne = serialized.o;
+    var size = serialized.s;
 
     Object.keys(index).forEach(function (key) {
       var value = index[key];
@@ -63,12 +63,12 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   function serializeFilterReverseIndex(fri) {
     return {
-      name: fri.name,
-      size: fri.size,
-      miscFilters: fri.miscFilters.map(function (filter) {
+      n: fri.name,
+      s: fri.size,
+      m: fri.miscFilters.map(function (filter) {
         return filter.id;
       }),
-      index: serializeFuzzyIndex(fri.index, function (bucket) {
+      i: serializeFuzzyIndex(fri.index, function (bucket) {
         return bucket.map(function (filter) {
           return filter.id;
         });
@@ -77,10 +77,10 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
   }
 
   function deserializeFilterReverseIndex(serialized, filtersIndex) {
-    var name = serialized.name;
-    var size = serialized.size;
-    var miscFilters = serialized.miscFilters;
-    var index = serialized.index;
+    var name = serialized.n;
+    var size = serialized.s;
+    var miscFilters = serialized.m;
+    var index = serialized.i;
 
     var fri = new FilterReverseIndex(name);
     fri.size = size;
@@ -109,20 +109,20 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   function serializeFilterHostnameDispatch(fhd) {
     return {
-      name: fhd.name,
-      size: fhd.size,
-      hostnameAnchors: serializeFuzzyIndex(fhd.hostnameAnchors, function (bucket) {
+      n: fhd.name,
+      s: fhd.size,
+      h: serializeFuzzyIndex(fhd.hostnameAnchors, function (bucket) {
         return serializeFilterReverseIndex(bucket);
       }),
-      filters: serializeFilterReverseIndex(fhd.filters)
+      f: serializeFilterReverseIndex(fhd.filters)
     };
   }
 
   function deserializeFilterHostnameDispatch(serialized, filtersIndex) {
-    var name = serialized.name;
-    var size = serialized.size;
-    var hostnameAnchors = serialized.hostnameAnchors;
-    var filters = serialized.filters;
+    var name = serialized.n;
+    var size = serialized.s;
+    var hostnameAnchors = serialized.h;
+    var filters = serialized.f;
 
     var fhd = new FilterHostnameDispatch(name);
     fhd.size = size;
@@ -140,18 +140,18 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     });
 
     return {
-      sourceDomainDispatch: sourceDomainDispatch,
-      miscFilters: serializeFilterHostnameDispatch(sdd.miscFilters),
-      name: sdd.name,
-      size: sdd.size
+      sd: sourceDomainDispatch,
+      m: serializeFilterHostnameDispatch(sdd.miscFilters),
+      n: sdd.name,
+      s: sdd.size
     };
   }
 
   function deserializeSourceDomainDispatch(serialized, filtersIndex) {
-    var sourceDomainDispatch = serialized.sourceDomainDispatch;
-    var miscFilters = serialized.miscFilters;
-    var name = serialized.name;
-    var size = serialized.size;
+    var sourceDomainDispatch = serialized.sd;
+    var miscFilters = serialized.m;
+    var name = serialized.n;
+    var size = serialized.s;
 
     var sdd = new FilterSourceDomainDispatch(name);
 
@@ -171,12 +171,12 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   function serializeCosmeticBucket(cb) {
     return {
-      name: cb.name,
-      size: cb.size,
-      miscFilters: cb.miscFilters.map(function (filter) {
+      n: cb.name,
+      s: cb.size,
+      m: cb.miscFilters.map(function (filter) {
         return filter.id;
       }),
-      index: serializeFuzzyIndex(cb.index, function (bucket) {
+      i: serializeFuzzyIndex(cb.index, function (bucket) {
         return bucket.map(function (filter) {
           return filter.id;
         });
@@ -185,10 +185,10 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
   }
 
   function deserializeCosmeticBucket(serialized, filtersIndex) {
-    var name = serialized.name;
-    var size = serialized.size;
-    var miscFilters = serialized.miscFilters;
-    var index = serialized.index;
+    var name = serialized.n;
+    var size = serialized.s;
+    var miscFilters = serialized.m;
+    var index = serialized.i;
 
     var cb = new CosmeticBucket(name);
     cb.size = size;
@@ -205,16 +205,16 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   function serializeCosmeticEngine(cosmetics) {
     return {
-      size: cosmetics.size,
-      miscFilters: serializeCosmeticBucket(cosmetics.miscFilters),
-      cosmetics: serializeFuzzyIndex(cosmetics.cosmetics, serializeCosmeticBucket)
+      s: cosmetics.size,
+      m: serializeCosmeticBucket(cosmetics.miscFilters),
+      c: serializeFuzzyIndex(cosmetics.cosmetics, serializeCosmeticBucket)
     };
   }
 
   function deserializeCosmeticEngine(engine, serialized, filtersIndex) {
-    var size = serialized.size;
-    var miscFilters = serialized.miscFilters;
-    var cosmetics = serialized.cosmetics;
+    var size = serialized.s;
+    var miscFilters = serialized.m;
+    var cosmetics = serialized.c;
 
     engine.size = size;
     engine.miscFilters = deserializeCosmeticBucket(miscFilters, filtersIndex);
@@ -238,7 +238,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
   function checkEngineRec(serialized, validFilterIds) {
     Object.keys(serialized).filter(function (key) {
-      return key !== 'size';
+      return key !== 's';
     }).forEach(function (key) {
       var value = serialized[key];
       if (typeof value === 'number') {
@@ -264,8 +264,8 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     });
   }
 
-  function serializeFiltersEngine(engine) {
-    var checkEngine = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+  function serializeFiltersEngine(engine, adbVersion) {
+    var checkEngine = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
     // Create a global index of filters to avoid redundancy
     // From `engine.lists` create a mapping: uid => filter
@@ -294,6 +294,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     });
 
     var serializedEngine = {
+      version: adbVersion,
       cosmetics: serializeCosmeticEngine(engine.cosmetics),
       filtersIndex: filters,
       size: engine.size,
@@ -311,13 +312,14 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     return serializedEngine;
   }
 
-  function deserializeFiltersEngine(engine, serialized) {
-    var checkEngine = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+  function deserializeFiltersEngine(engine, serialized, adbVersion) {
+    var checkEngine = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
 
     if (checkEngine) {
       serializedEngineSanityCheck(serialized);
     }
 
+    var version = serialized.version;
     var cosmetics = serialized.cosmetics;
     var filtersIndex = serialized.filtersIndex;
     var size = serialized.size;
@@ -326,6 +328,11 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     var importants = serialized.importants;
     var redirect = serialized.redirect;
     var filters = serialized.filters;
+
+    if (version !== adbVersion) {
+      // If the version does not match, then we invalidate the engine and start fresh
+      return;
+    }
 
     // Deserialize filters index
     var filtersReverseIndex = Object.create(null);
@@ -359,7 +366,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
     setters: [function (_antitrackingUrl) {
       URLInfo = _antitrackingUrl.URLInfo;
     }, function (_adblockerUtils) {
-      log = _adblockerUtils.log;
+      log = _adblockerUtils['default'];
     }, function (_adblockerFiltersParsing) {
       parseList = _adblockerFiltersParsing['default'];
       parseJSResource = _adblockerFiltersParsing.parseJSResource;
@@ -407,7 +414,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
             var _this = this;
 
             // Only true if we insert something (we have at least 1 token)
-            log('SET ' + key);
+            log('SET ' + key + ' => ' + JSON.stringify(value));
             var inserted = false;
             var insertValue = function insertValue(token) {
               log('FOUND TOKEN ' + token);
@@ -525,24 +532,27 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
         _createClass(FilterReverseIndex, [{
           key: 'push',
           value: function push(filter) {
-            log('REVERSE INDEX ' + this.name + ' INSERT ' + filter.rawLine);
-            ++this.size;
-            var inserted = this.index.set(filter.filterStr, filter);
+            log('REVERSE INDEX ' + this.name + ' INSERT ' + JSON.stringify(filter));
+            this.size += 1;
+            var inserted = false;
+            if (filter.filterStr) {
+              inserted = this.index.set(filter.filterStr, filter);
+            }
 
             if (!inserted) {
-              log(this.name + ' MISC FILTER ' + filter.rawLine);
+              log(this.name + ' MISC FILTER ' + JSON.stringify(filter));
               this.miscFilters.push(filter);
             }
           }
         }, {
           key: 'matchList',
           value: function matchList(request, list, checkedFilters) {
-            for (var i = 0; i < list.length; i++) {
+            for (var i = 0; i < list.length; i += 1) {
               var filter = list[i];
               if (!checkedFilters.has(filter.id)) {
                 checkedFilters.add(filter.id);
                 if (matchNetworkFilter(filter, request)) {
-                  log('INDEX ' + this.name + ' MATCH ' + filter.rawLine + ' ~= ' + request.url);
+                  log('INDEX ' + this.name + ' MATCH ' + JSON.stringify(filter) + ' ~= ' + request.url);
                   return filter;
                 }
               }
@@ -648,10 +658,10 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
         _createClass(FilterHostnameDispatch, [{
           key: 'push',
           value: function push(filter) {
-            ++this.size;
+            this.size += 1;
 
             var inserted = false;
-            if (filter.hostname !== null) {
+            if (filter.hostname) {
               inserted = this.hostnameAnchors.set(filter.hostname, filter);
             }
 
@@ -744,11 +754,11 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
           value: function push(filter) {
             var _this4 = this;
 
-            ++this.size;
+            this.size += 1;
 
-            if (filter.optNotDomains === null && filter.optDomains !== null) {
-              filter.optDomains.forEach(function (domain) {
-                log('SOURCE DOMAIN DISPATCH ' + domain + ' filter: ' + filter.rawLine);
+            if (filter.optNotDomains.length === 0 && filter.optDomains.length > 0) {
+              filter.optDomains.split('|').forEach(function (domain) {
+                log('SOURCE DOMAIN DISPATCH ' + domain + ' filter: ' + JSON.stringify(filter));
                 var bucket = _this4.sourceDomainDispatch.get(domain);
                 if (bucket === undefined) {
                   var newIndex = new FilterHostnameDispatch(_this4.name + '_' + domain);
@@ -812,7 +822,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
         _createClass(CosmeticBucket, [{
           key: 'push',
           value: function push(filter) {
-            ++this.size;
+            this.size += 1;
             var inserted = this.index.set(filter.selector, filter);
 
             if (!inserted) {
@@ -830,11 +840,20 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
           value: function getMatchingRules(hostname, nodeInfo) {
             var _this5 = this;
 
-            var rules = [].concat(_toConsumableArray(this.miscFilters.filter(function (filter) {
-              return matchCosmeticFilter(filter, hostname);
-            })));
+            var rules = [];
             var uniqIds = new Set();
 
+            // Deal with misc filters
+            this.miscFilters.filter(function (rule) {
+              return matchCosmeticFilter(rule, hostname);
+            }).forEach(function (rule) {
+              if (!uniqIds.has(rule.id)) {
+                rules.push(rule);
+                uniqIds.add(rule.id);
+              }
+            });
+
+            // Find other matching rules in engine
             nodeInfo.forEach(function (node) {
               // [id, tagName, className] = node
               node.forEach(function (token) {
@@ -851,27 +870,22 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
             var matchingRules = {};
             function addRule(rule, matchingHost, exception) {
+              var value = { rule: rule, matchingHost: matchingHost, exception: exception };
               if (rule.selector in matchingRules) {
                 var oldMatchingHost = matchingRules[rule.selector].matchingHost;
                 if (matchingHost.length > oldMatchingHost.length) {
-                  matchingRules[rule.selector] = {
-                    rule: rule,
-                    exception: exception,
-                    matchingHost: matchingHost
-                  };
+                  matchingRules[rule.selector] = value;
                 }
               } else {
-                matchingRules[rule.selector] = {
-                  rule: rule,
-                  exception: exception,
-                  matchingHost: matchingHost
-                };
+                matchingRules[rule.selector] = value;
               }
             }
 
             // filter by hostname
-            if (hostname !== '') {
-              rules.forEach(function (rule) {
+            rules.forEach(function (rule) {
+              if (rule.hostnames.length === 0) {
+                addRule(rule, '', false);
+              } else {
                 rule.hostnames.forEach(function (h) {
                   var exception = false;
                   if (h.startsWith('~')) {
@@ -885,13 +899,8 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
                     addRule(rule, h, exception);
                   }
                 });
-              });
-            } else {
-              // miscFilters
-              rules.forEach(function (rule) {
-                addRule(rule, '', false);
-              });
-            }
+              }
+            });
 
             return matchingRules;
           }
@@ -964,7 +973,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
             log('getMatchingRules ' + url + ' => ' + hostname + ' (' + JSON.stringify(nodeInfo) + ')');
 
             // Check misc bucket
-            var miscMatchingRules = this.miscFilters.getMatchingRules('', nodeInfo);
+            var miscMatchingRules = this.miscFilters.getMatchingRules(hostname, nodeInfo);
 
             // Check hostname buckets
             this.cosmetics.getFromKey(hostname).forEach(function (bucket) {
@@ -1022,7 +1031,16 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
                         if (rule.scriptInject) {
                           // make sure the selector was replaced by javascript
                           if (!rule.scriptReplaced) {
+                            if (rule.selector.includes(',')) {
+                              rule.scriptArguments = rule.selector.split(',').slice(1).map(String.trim);
+                              rule.selector = rule.selector.split(',')[0];
+                            }
                             rule.selector = js.get(rule.selector);
+                            if (rule.scriptArguments) {
+                              rule.scriptArguments.forEach(function (e, idx) {
+                                rule.selector = rule.selector.replace('{{' + ++idx + '}}', e);
+                              });
+                            }
                             rule.scriptReplaced = true;
                           }
                         }
@@ -1031,7 +1049,8 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
                           uniqIds.add(rule.id);
                         }
                       } else {
-                        // otherwise, then this implies that the two rules negating each others and should be removed
+                        // otherwise, then this implies that the two rules
+                        // negating each others and should be removed
                         rules.splice(rules.indexOf(selectorMatched), 1);
                         uniqIds.add(rule.id);
                       }
@@ -1142,6 +1161,8 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
           value: function onUpdateFilters(lists) {
             var _this9 = this;
 
+            var debug = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
             // Mark the engine as updated, so that it will be serialized on disk
             if (lists.length > 0) {
               this.updated = true;
@@ -1170,7 +1191,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
               var redirect = [];
 
               // Parse and dispatch filters depending on type
-              var parsed = parseList(filters);
+              var parsed = parseList(filters, debug);
 
               // Cosmetic filters
               var cosmetics = parsed.cosmeticFilters;
@@ -1180,7 +1201,7 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
                   exceptions.push(filter);
                 } else if (filter.isImportant) {
                   importants.push(filter);
-                } else if (filter.redirect !== null && filter.redirect !== undefined) {
+                } else if (filter.redirect) {
                   redirect.push(filter);
                 } else {
                   miscFilters.push(filter);
@@ -1291,24 +1312,24 @@ System.register('adblocker/filters-engine', ['antitracking/url', 'adblocker/util
 
             log('Total filters ' + checkedFilters.size);
             if (result !== null) {
-              if (result.redirect !== null) {
+              if (result.redirect) {
                 var _resources$get = this.resources.get(result.redirect);
 
                 var data = _resources$get.data;
                 var contentType = _resources$get.contentType;
 
                 var dataUrl = undefined;
-                // if (contentType.includes(';')) {
-                //   dataUrl = `data:${contentType},${data}`;
-                // } else {
-                //   dataUrl = `data:${contentType};base64,${btoa(data)}`;
-                // }
+                if (contentType.includes(';')) {
+                  dataUrl = 'data:' + contentType + ',' + data;
+                } else {
+                  dataUrl = 'data:' + contentType + ';base64,' + btoa(data);
+                }
 
                 return {
-                  match: false
+                  match: true,
+                  redirect: dataUrl.trim()
                 };
               }
-              // redirect: dataUrl.trim(),
               return { match: true };
             }
 
