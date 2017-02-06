@@ -51,40 +51,40 @@ public class Adblocker {
     }
     
     public func getAdBlockingInfo(url: String) -> [NSObject : AnyObject]? {
-        guard self.engine.isRunning() else {
-            return nil
-        }
-        
-        do {
-            let stats = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adbStats"], functionName: "report", arguments: [url])
-            return stats?.toDictionary()
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in Adblocker.getAdBlockingInfo: \(error)")
-        }
+//        guard self.engine.isRunning() else {
+//            return nil
+//        }
+//        
+//        do {
+//            let stats = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adbStats"], functionName: "report", arguments: [url])
+//            return stats?.toDictionary()
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in Adblocker.getAdBlockingInfo: \(error)")
+//        }
         return nil
     }
     
     public func isBlacklisted(url: String) -> Bool? {
-        guard self.engine.isRunning() else {
-            return nil
-        }
-        
-        do {
-            let blacklisted = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "isDomainInBlacklist", arguments: [url])
-            if let blacklisted =  blacklisted {
-                return blacklisted.toBool()
-            }
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in Adblocker.isBlacklisted: \(error)")
-        }
+//        guard self.engine.isRunning() else {
+//            return nil
+//        }
+//        
+//        do {
+//            let blacklisted = try engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "isDomainInBlacklist", arguments: [url])
+//            if let blacklisted =  blacklisted {
+//                return blacklisted.toBool()
+//            }
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in Adblocker.isBlacklisted: \(error)")
+//        }
         return false
     }
     
     public func toggleUrl(url: String, domain: Bool) {
-        do {
-            try self.engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in Adblocker.toggleUrl: \(error)")
-        }
+//        do {
+//            try self.engine.systemLoader?.callFunctionOnModuleAttribute(Adblocker.moduleName + "/adblocker", attribute: ["default", "adBlocker"], functionName: "toggleUrl", arguments: [url, domain])
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in Adblocker.toggleUrl: \(error)")
+//        }
     }
 }

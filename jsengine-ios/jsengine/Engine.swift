@@ -23,8 +23,8 @@ public class Engine {
 //    var http: HttpHandler?
     public var webRequest: WebRequest?
 
-    //MARK: - Singltone
-    static let sharedInstance = Engine(bundle: NSBundle.mainBundle())
+    //MARK: - Singleton
+    static let sharedInstance = Engine()
     
     let bridge : RCTBridge
     public let rootView : RCTRootView
@@ -46,63 +46,23 @@ public class Engine {
     
     //MARK: - Public APIs
     public func isRunning() -> Bool {
-        return self.mIsRunning
+        return true
     }
     
     public func startup(defaultPrefs: [String: AnyObject]? = [String: AnyObject]()) {
-        dispatch_async(dispatchQueue) {[weak self] in
-            do {
-                if let jsengine = self?.jsengine ,let systemLoader = self?.systemLoader {
-                    let config = systemLoader.readSourceFile("cliqz", buildPath: "/build/config/", fileExtension: "json")
-                    jsengine.evaluateScript("var __CONFIG__ = JSON.parse('\(config!)');")
-                    let defaultJSON = self?.parseJSON(defaultPrefs!)
-                    jsengine.evaluateScript("var __DEFAULTPREFS__ = \(defaultJSON!);")
-                    try systemLoader.callFunctionOnModule("platform/startup", functionName: "startup")
-                    self?.mIsRunning = true
-                }
-            } catch let error as NSError {
-                DebugLogger.log("<< Error while executing the startup function in the platform/startup module: \(error)")
-            }
-        }
+        
     }
     
     public func shutdown(strict: Bool? = false) throws {
-        try systemLoader?.callVoidFunctionOnModule("platform/startup", functionName: "shutdown")
-        self.mIsRunning = false
-    }
-    
-<<<<<<< HEAD
-    public func setPref(prefName: String, prefValue: AnyObject) {
-        dispatch_async(self.dispatchQueue) {
-            do {
-                try self.systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "setPref", arguments: [prefName, prefValue])
-            } catch let error as NSError {
-                DebugLogger.log("<< Error while executing Engine.setPref: \(error)")
-            }
-            
-        }
-    }
-    
-    public func getPref(prefName: String) throws -> AnyObject? {
-        guard isRunning() else {
-            return nil
-        }
         
-        return try systemLoader?.callFunctionOnModuleAttribute("core/utils", attribute: ["default"], functionName: "getPref", arguments: [prefName])
     }
     
-    public func setLoggingEnabled(enabled: Bool) {
-        dispatch_async(self.dispatchQueue) { 
-            self.setPref("showConsoleLogs", prefValue: enabled)
-        }
-=======
     func setPref(prefName: String, prefValue: Any) {
 //        self.jsengine?.evaluateScript("")
     }
     
     func getPref(prefName: String) {
 //        self.jsengine?.evaluateScript("")
->>>>>>> 2d99d96... Test sending message from native to react.
     }
     
     public func parseJSON(dictionary: [String: AnyObject]) -> String {

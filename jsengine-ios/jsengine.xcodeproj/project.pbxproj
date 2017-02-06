@@ -14,8 +14,6 @@
 		860373BE1E08169800749750 /* SystemLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860373BD1E08169800749750 /* SystemLoader.swift */; };
 		86173C151E1A7E1400015F5B /* PromiseCallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86173C141E1A7E1400015F5B /* PromiseCallback.swift */; };
 		865D9A151E291E3C00B82F81 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 865D9A141E291E3B00B82F81 /* assets */; };
-		865D9A161E291E6800B82F81 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 865D9A141E291E3B00B82F81 /* assets */; };
-		864134B41E3238490019683D /* AdblockerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864134B31E3238490019683D /* AdblockerTest.swift */; };
 		865D9A181E292C1000B82F81 /* AntiTracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A171E292C1000B82F81 /* AntiTracking.swift */; };
 		865D9A1A1E2CCFAF00B82F81 /* Adblocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A191E2CCFAF00B82F81 /* Adblocker.swift */; };
 		865D9A1C1E2E1E3E00B82F81 /* CryptoTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865D9A1B1E2E1E3E00B82F81 /* CryptoTest.swift */; };
@@ -98,7 +96,6 @@
 		860373B61E043C1200749750 /* WebRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebRequest.swift; sourceTree = "<group>"; };
 		860373BD1E08169800749750 /* SystemLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SystemLoader.swift; sourceTree = "<group>"; };
 		86173C141E1A7E1400015F5B /* PromiseCallback.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PromiseCallback.swift; sourceTree = "<group>"; };
-		865D9A141E291E3B00B82F81 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = "../../jsengine-android/jsengine/src/main/assets"; sourceTree = "<group>"; };
 		864134B31E3238490019683D /* AdblockerTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdblockerTest.swift; sourceTree = "<group>"; };
 		865D9A171E292C1000B82F81 /* AntiTracking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AntiTracking.swift; sourceTree = "<group>"; };
 		865D9A191E2CCFAF00B82F81 /* Adblocker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Adblocker.swift; sourceTree = "<group>"; };
@@ -567,11 +564,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-<<<<<<< HEAD
 				865D9A151E291E3C00B82F81 /* assets in Resources */,
-=======
 				B34011EF1E48ACF900E4383D /* main.jsbundle in Resources */,
->>>>>>> e39b24f... Add bundle for ios and build option to toggle between bundle and test server.
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

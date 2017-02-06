@@ -19,12 +19,12 @@ public class AntiTracking {
     
     //MARK: - Instant variables
     var engine: Engine
-    var webReuest: WebRequest
+    var webRequest: WebRequest
     
     //MARK: - Init
     public init(engine: Engine) {
         self.engine = engine
-        self.webReuest = engine.webRequest!
+        self.webRequest = engine.webRequest!
     }
     
     //MARK: - Public APIs
@@ -64,53 +64,53 @@ public class AntiTracking {
     }
     
     public func getTabBlockingInfo(tabId: Int) -> [NSObject : AnyObject]? {
-        guard self.engine.isRunning() else {
-            return nil
-        }
-        
-        do {
-            var argument = [AnyObject]()
-            argument.append(tabId)
-            if let tabUrl = webReuest.getUrlForTab(tabId) {
-                argument.append(tabUrl)
-            }
-            let blockingInfo = try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "getTabBlockingInfo", arguments: argument)
-            return blockingInfo?.toDictionary()
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in AntiTracking.getTabBlockingInfo: \(error)")
-        }
+//        guard self.engine.isRunning() else {
+//            return nil
+//        }
+//        
+//        do {
+//            var argument = [AnyObject]()
+//            argument.append(tabId)
+//            if let tabUrl = webReuest.getUrlForTab(tabId) {
+//                argument.append(tabUrl)
+//            }
+//            let blockingInfo = try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "getTabBlockingInfo", arguments: argument)
+//            return blockingInfo?.toDictionary()
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in AntiTracking.getTabBlockingInfo: \(error)")
+//        }
         return nil
     }
     
     public func isWhitelisted(url: String) -> Bool? {
-        guard self.engine.isRunning() else {
-            return nil
-        }
-        
-        do {
-            let whitelisted = try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "isSourceWhitelisted", arguments: [url])
-            if let whitelisted =  whitelisted {
-                return whitelisted.toBool()
-            }
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in AntiTracking.isWhitelisted: \(error)")
-        }
+//        guard self.engine.isRunning() else {
+//            return nil
+//        }
+//        
+//        do {
+//            let whitelisted = try engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "isSourceWhitelisted", arguments: [url])
+//            if let whitelisted =  whitelisted {
+//                return whitelisted.toBool()
+//            }
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in AntiTracking.isWhitelisted: \(error)")
+//        }
         return false
     }
     
     public func addDomainToWhitelist(url: String) {
-        do {
-            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "addSourceDomainToWhitelist", arguments: [url])
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in AntiTracking.addDomainToWhitelist: \(error)")
-        }
+//        do {
+//            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "addSourceDomainToWhitelist", arguments: [url])
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in AntiTracking.addDomainToWhitelist: \(error)")
+//        }
     }
     
     public func removeDomainFromWhitelist(url: String) {
-        do {
-            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "removeSourceDomainFromWhitelist", arguments: [url])
-        } catch let error as NSError {
-            DebugLogger.log("<< Error in AntiTracking.removeDomainFromWhitelist: \(error)")
-        }
+//        do {
+//            try self.engine.systemLoader?.callFunctionOnModuleAttribute(AntiTracking.moduleName + "/attrack", attribute: ["default"], functionName: "removeSourceDomainFromWhitelist", arguments: [url])
+//        } catch let error as NSError {
+//            DebugLogger.log("<< Error in AntiTracking.removeDomainFromWhitelist: \(error)")
+//        }
     }
 }
