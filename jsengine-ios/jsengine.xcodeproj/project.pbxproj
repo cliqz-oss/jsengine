@@ -40,6 +40,8 @@
 		B30042161DF867B5004F9E14 /* FileIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = B30042151DF867B5004F9E14 /* FileIO.swift */; };
 		B30042231DF86B66004F9E14 /* WindowTimers.h in Headers */ = {isa = PBXBuildFile; fileRef = B30042211DF86B66004F9E14 /* WindowTimers.h */; };
 		B30042241DF86B66004F9E14 /* WindowTimers.m in Sources */ = {isa = PBXBuildFile; fileRef = B30042221DF86B66004F9E14 /* WindowTimers.m */; };
+		B34011EF1E48ACF900E4383D /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = B34011EE1E48ACF900E4383D /* main.jsbundle */; };
+		B34011F01E48AF2100E4383D /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = B34011EE1E48ACF900E4383D /* main.jsbundle */; };
 		B3429D2C1DFEA69000F27916 /* HttpHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3429D2B1DFEA69000F27916 /* HttpHandler.swift */; };
 		B3780DBD1E30F3BD00863B46 /* WebRequestBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */; };
 		B39D56C01E0177BF004AD927 /* ChromeUrlHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */; };
@@ -132,6 +134,7 @@
 		B30042211DF86B66004F9E14 /* WindowTimers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowTimers.h; sourceTree = "<group>"; };
 		B30042221DF86B66004F9E14 /* WindowTimers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WindowTimers.m; sourceTree = "<group>"; };
 		B30042251DF86B92004F9E14 /* jsengineBridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jsengineBridging-Header.h"; sourceTree = "<group>"; };
+		B34011EE1E48ACF900E4383D /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = SOURCE_ROOT; };
 		B3429D2B1DFEA69000F27916 /* HttpHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = HttpHandler.swift; path = jsengine/HttpHandler.swift; sourceTree = SOURCE_ROOT; };
 		B3780DBC1E30F3BD00863B46 /* WebRequestBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebRequestBridge.m; sourceTree = "<group>"; };
 		B39D56BF1E0177BF004AD927 /* ChromeUrlHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChromeUrlHandler.swift; sourceTree = "<group>"; };
@@ -292,7 +295,7 @@
 		B3CEA5CB1DF6CA0000880EF8 /* jsengine */ = {
 			isa = PBXGroup;
 			children = (
-				865D9A141E291E3B00B82F81 /* assets */,
+				B34011EE1E48ACF900E4383D /* main.jsbundle */,
 				B30042201DF86B04004F9E14 /* ThirdParty */,
 				B30041C51DF84EAB004F9E14 /* Engine.swift */,
 				865D9A171E292C1000B82F81 /* AntiTracking.swift */,
@@ -542,6 +545,7 @@
 				865D9A161E291E6800B82F81 /* assets in Resources */,
 				B30041EB1DF8639C004F9E14 /* Assets.xcassets in Resources */,
 				B30041E91DF8639C004F9E14 /* Main.storyboard in Resources */,
+				B34011F01E48AF2100E4383D /* main.jsbundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -563,7 +567,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+<<<<<<< HEAD
 				865D9A151E291E3C00B82F81 /* assets in Resources */,
+=======
+				B34011EF1E48ACF900E4383D /* main.jsbundle in Resources */,
+>>>>>>> e39b24f... Add bundle for ios and build option to toggle between bundle and test server.
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1000,6 +1008,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "-DReact_Debug";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.jsengine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1024,6 +1033,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.cliqz.jsengine;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

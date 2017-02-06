@@ -1,0 +1,2 @@
+#!/bin/bash
+node node_modules/react-native/local-cli/cli.js bundle --entry-file index.ios.js --platform ios --bundle-output jsengine-ios/main.jsbundle

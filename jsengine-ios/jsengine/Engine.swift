@@ -31,8 +31,13 @@ public class Engine {
     
     //MARK: - Init
     public init() {
-//        let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
-        let jsCodeLocation = NSBundle.mainBundle().URLForResource("main", withExtension: "jsbundle")
+
+        #if React_Debug
+            let jsCodeLocation = NSURL(string: "http://localhost:8081/index.ios.bundle?platform=ios")
+        #else
+            let jsCodeLocation = NSBundle.mainBundle().URLForResource("main", withExtension: "jsbundle")
+        #endif
+        
         rootView = RCTRootView( bundleURL: jsCodeLocation, moduleName: "ExtensionApp", initialProperties: nil, launchOptions: nil )
         bridge = rootView.bridge
         webRequest = bridge.moduleForClass(WebRequest) as? WebRequest
