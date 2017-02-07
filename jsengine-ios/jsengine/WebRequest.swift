@@ -62,10 +62,9 @@ public class WebRequest {
     
     private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
 
-        if let requestInfoJsonString = toJSONString(requestInfo),
-            onBeforeRequest = self.webRequest?.valueForProperty("onBeforeRequest") {
+        if let onBeforeRequest = self.webRequest?.valueForProperty("onBeforeRequest") {
             
-            let blockResponse = onBeforeRequest.invokeMethod("_trigger", withArguments: [requestInfoJsonString])?.toDictionary()
+            let blockResponse = onBeforeRequest.invokeMethod("_trigger", withArguments: [requestInfo])?.toDictionary()
             
             return blockResponse
         }
