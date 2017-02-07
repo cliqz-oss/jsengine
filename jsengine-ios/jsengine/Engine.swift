@@ -45,8 +45,11 @@ public class Engine {
             self.fileIO!.extend(self.jsengine!)
             crypto.extend(self.jsengine!)
             self.http!.extend(self.jsengine!)
-            self.webRequest!.extend(self.jsengine!)
+            
+            
             self.systemLoader = SystemLoader(context: self.jsengine!, assetsRoot: "assets", buildRoot: "/build/modules/", bundle: bundle)
+            self.webRequest!.extend(self.jsengine!)
+            
         }
     }
     
@@ -65,6 +68,10 @@ public class Engine {
                     jsengine.evaluateScript("var __DEFAULTPREFS__ = \(defaultJSON!);")
                     try systemLoader.callFunctionOnModule("platform/startup", functionName: "startup")
                     self?.mIsRunning = true
+                    
+                    // Register the interceptor protocol after the engine finishing running
+                    // TODO: this step should be called after the AdBlocker finish loading otherwise it will block loading of websites visiting before loading finished
+                    NSURLProtocol.registerClass(InterceptorURLProtocol)
                 }
             } catch let error as NSError {
                 DebugLogger.log("<< Error while executing the startup function in the platform/startup module: \(error)")

@@ -43,7 +43,9 @@ class SystemLoader {
         // some custom modules for the App: system and promise
         context.evaluateScript("System.set('system', { default: System });");
         context.evaluateScript("System.set('promise', { default: Promise });");
-
+        
+        // load webrequest
+        self.loadJavascriptSource("webrequest")
     }
     
     func readSourceFile(assetPath: String, buildPath: String, fileExtension: String) -> String? {

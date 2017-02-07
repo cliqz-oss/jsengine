@@ -12,6 +12,7 @@ import JavaScriptCore
 public class WebRequest {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
+    var webRequest: JSValue?
     
     init() {
         
@@ -19,17 +20,15 @@ public class WebRequest {
     
     func extend(context: JSContext) {
         self.jsContext = context
-        let webRequest = JSValue.init(newObjectInContext: context)
-        
         let nativeIsWindowActive: @convention(block) (Int) -> Bool = {[weak self] tabId in
             if let tabActive = self?.isTabActive(tabId) {
                 return tabActive
             }
             return false
         }
-        webRequest.setObject(unsafeBitCast(nativeIsWindowActive, AnyObject.self), forKeyedSubscript: "_nativeIsWindowActive")
+        context.setObject(unsafeBitCast(nativeIsWindowActive, AnyObject.self), forKeyedSubscript: "_nativeIsWindowActive")
         
-        context.setObject(webRequest, forKeyedSubscript: "webRequest")
+        self.webRequest = context.evaluateScript("webRequest")
     }
     
     func shouldBlockRequest(request: NSURLRequest) -> Bool {
@@ -62,10 +61,12 @@ public class WebRequest {
     //MARK: - Private Methods
     
     private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
-        
-        if let requestInfoJsonString = toJSONString(requestInfo) {
-            let onBeforeRequestCall = "System.get('platform/webrequest').default.onBeforeRequest._trigger(\(requestInfoJsonString));"
-            let blockResponse = self.jsContext?.evaluateScript(onBeforeRequestCall).toDictionary()
+
+        if let requestInfoJsonString = toJSONString(requestInfo),
+            onBeforeRequest = self.webRequest?.valueForProperty("onBeforeRequest") {
+            
+            let blockResponse = onBeforeRequest.invokeMethod("_trigger", withArguments: [requestInfoJsonString])?.toDictionary()
+            
             return blockResponse
         }
         return nil
