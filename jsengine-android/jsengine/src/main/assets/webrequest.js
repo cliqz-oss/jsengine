@@ -29,18 +29,17 @@ var webRequest = {
           requestInfo.getRequestHeader = function(header) {
             return requestInfo.requestHeaders[header];
           };
-          var returnBlockingResponse = {};
-          this.listeners.forEach(function(listener) {
+          for (var i=0; i < this.listeners.length; i++) {
+            const listener = this.listeners[i];
             const fn = listener.fn;
             const filter = listener.filter;
             const extraInfo = listener.extraInfo;
             const blockingResponse = fn(requestInfo);
             if (blockingResponse && Object.keys(blockingResponse).length > 0) {
-                    returnBlockingResponse = blockingResponse;
-                    return;
+                return blockingResponse;
             }
-          });
-          return returnBlockingResponse;
+          }
+          return {};
         }
       },
 

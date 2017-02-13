@@ -60,7 +60,7 @@ public class WebRequest {
     
     //MARK: - Private Methods
     
-    private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
+    func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
 
         if let onBeforeRequest = self.webRequest?.valueForProperty("onBeforeRequest") {
             
