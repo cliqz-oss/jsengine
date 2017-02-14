@@ -23,16 +23,18 @@ public class Engine {
     var webRequest: WebRequest?
     var systemLoader: SystemLoader?
     var mIsRunning: Bool = false
+    var bundle: NSBundle
 
     //MARK: - Singltone
     static let sharedInstance = Engine(bundle: NSBundle.mainBundle())
     
     //MARK: - Init
     public init(bundle: NSBundle) {
+        self.bundle = bundle
         self.fileIO = FileIO(queue:self.dispatchQueue)
         let crypto = Crypto()
         self.http = ChromeUrlHandler(queue: self.dispatchQueue, basePath: self.buildPath)
-        self.webRequest = WebRequest()
+        self.webRequest = WebRequest(bundle: bundle)
         
         dispatch_async(dispatchQueue) {
             self.jsengine = JSContext()
@@ -62,7 +64,7 @@ public class Engine {
         dispatch_async(dispatchQueue) {[weak self] in
             do {
                 if let jsengine = self?.jsengine ,let systemLoader = self?.systemLoader {
-                    let config = systemLoader.readSourceFile("cliqz", buildPath: "/build/config/", fileExtension: "json")
+                    let config = Utils.readSourceFile(self!.bundle, assetsRoot: "assets", assetPath: "cliqz", buildPath: "/build/config/", fileExtension: "json")
                     jsengine.evaluateScript("var __CONFIG__ = JSON.parse('\(config!)');")
                     let defaultJSON = self?.parseJSON(defaultPrefs!)
                     jsengine.evaluateScript("var __DEFAULTPREFS__ = \(defaultJSON!);")

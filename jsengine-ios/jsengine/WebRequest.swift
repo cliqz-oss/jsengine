@@ -13,9 +13,10 @@ public class WebRequest {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
     var webRequest: JSValue?
+    var bundle: NSBundle
     
-    init() {
-        
+    init(bundle: NSBundle) {
+        self.bundle = bundle
     }
     
     func extend(context: JSContext) {
@@ -28,7 +29,14 @@ public class WebRequest {
         }
         context.setObject(unsafeBitCast(nativeIsWindowActive, AnyObject.self), forKeyedSubscript: "_nativeIsWindowActive")
         
-        self.webRequest = context.evaluateScript("webRequest")
+        if let content = Utils.readSourceFile(self.bundle, assetsRoot: "assets", assetPath: "webrequest", buildPath: "", fileExtension: "js") {
+            self.jsContext!.evaluateScript(content)
+        } else {
+            DebugLogger.log("<< Could not load file: webrequest.js")
+        }
+        
+        self.webRequest = self.jsContext?.evaluateScript("webRequest")
+
     }
     
     func shouldBlockRequest(request: NSURLRequest) -> Bool {
