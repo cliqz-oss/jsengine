@@ -26,7 +26,7 @@ System.register('adblocker/filters-loader', ['core/resource-loader', 'core/langu
 
   function getBowerUrl(assetName) {
     var bowerName = FILTER_BOWER_PREFIX + assetName.replace(/\//g, '_').replace(/\./g, '-');
-    return 'chrome://cliqz/content/adblocker/mobile/' + assetName;
+    return 'chrome://cliqz/content/bower_components/' + bowerName + '/index.txt';
   }
 
   return {
@@ -48,7 +48,7 @@ System.register('adblocker/filters-loader', ['core/resource-loader', 'core/langu
       ONE_HOUR = 60 * ONE_MINUTE;
 
       // URLs to fetch block lists
-      BASE_URL = 'https://s3.amazonaws.com/cdn.cliqz.com/adblocking/mobile-test/';
+      BASE_URL = 'https://cdn.cliqz.com/adblocking/latest-filters/';
       LANGS = Language.state();
       EOL = '\n';
       FILTER_BOWER_PREFIX = "adb_";
@@ -140,7 +140,7 @@ System.register('adblocker/filters-loader', ['core/resource-loader', 'core/langu
         _createClass(_default, [{
           key: 'remoteURL',
           value: function remoteURL() {
-            return 'https://s3.amazonaws.com/cdn.cliqz.com/adblocking/mobile-test/allowed-lists.json?t=' + parseInt(Date.now() / 60 / 60 / 1000, 10);
+            return 'https://cdn.cliqz.com/adblocking/' + platformName + '/allowed-lists.json?t=' + parseInt(Date.now() / 60 / 60 / 1000, 10);
           }
         }, {
           key: 'stop',
