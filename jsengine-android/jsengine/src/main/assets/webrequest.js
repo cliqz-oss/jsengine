@@ -2,11 +2,11 @@
 var webRequest = {
     onBeforeRequest: {
         listeners: [],
-        addListener(listener, filter, extraInfo) {
-          this.listeners.push({fn: listener, filter, extraInfo});
+        addListener: function(listener, filter, extraInfo) {
+          this.listeners.push({fn: listener, filter: filter, extraInfo: extraInfo});
         },
-        removeListener(listener) {
-          const ind = this.listeners.findIndex((l) => {
+        removeListener: function(listener) {
+          const ind = this.listeners.findIndex(function(l) {
             return l.fn === listener;
           });
           if (ind > -1) {
@@ -14,7 +14,7 @@ var webRequest = {
           }
         },
 
-        _triggerJson(requestInfoJson) {
+        _triggerJson: function(requestInfoJson) {
           const requestInfo = JSON.parse(requestInfoJson);
           try {
               const response = webRequest.onBeforeRequest._trigger(requestInfo) || {};
@@ -24,29 +24,32 @@ var webRequest = {
           }
         },
 
-        _trigger(requestInfo) {
+        _trigger: function(requestInfo) {
           // getter for request headers
           requestInfo.getRequestHeader = function(header) {
             return requestInfo.requestHeaders[header];
           };
-          for (let listener of this.listeners) {
-              const {fn, filter, extraInfo} = listener;
-              const blockingResponse = fn(requestInfo);
-              if (blockingResponse && Object.keys(blockingResponse).length > 0) {
+          for (var i=0; i < this.listeners.length; i++) {
+            const listener = this.listeners[i];
+            const fn = listener.fn;
+            const filter = listener.filter;
+            const extraInfo = listener.extraInfo;
+            const blockingResponse = fn(requestInfo);
+            if (blockingResponse && Object.keys(blockingResponse).length > 0) {
                 return blockingResponse;
-              }
+            }
           }
           return {};
         }
       },
 
       onBeforeSendHeaders: {
-        addListener(listener, filter, extraInfo) {},
-        removeListener(listener) {}
+        addListener: function(listener, filter, extraInfo) {},
+        removeListener: function(listener) {}
       },
 
       onHeadersReceived: {
-        addListener(listener, filter, extraInfo) {},
-        removeListener(listener) {}
+        addListener: function(listener, filter, extraInfo) {},
+        removeListener: function(listener) {}
       }
 }

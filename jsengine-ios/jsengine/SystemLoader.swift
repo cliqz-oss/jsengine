@@ -43,19 +43,6 @@ class SystemLoader {
         // some custom modules for the App: system and promise
         context.evaluateScript("System.set('system', { default: System });");
         context.evaluateScript("System.set('promise', { default: Promise });");
-
-    }
-    
-    func readSourceFile(assetPath: String, buildPath: String, fileExtension: String) -> String? {
-        var content: String? = nil
-        let (sourceName, directory) = getSourceMetaData(assetPath, buildPath: buildPath)
-        if let path = self.bundle.pathForResource(sourceName, ofType: fileExtension, inDirectory: directory){
-            content = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
-        } else {
-            DebugLogger.log("<< Script not found: \(assetPath)")
-            
-        }
-        return content
     }
     
     func loadModule(moduleName: String) throws -> JSValue {
@@ -105,7 +92,7 @@ class SystemLoader {
     }
     
     func loadSubScript(assetPath: String) {
-        if let content = readSourceFile(assetPath, buildPath: self.buildRoot, fileExtension: "js") {
+        if let content = Utils.readSourceFile(self.bundle, assetsRoot: self.assetsRoot, assetPath: assetPath, buildPath: self.buildRoot, fileExtension: "js") {
             self.jsContext?.evaluateScript(content)
         } else {
             DebugLogger.log("<< Could not load file: \(assetPath)")
@@ -113,45 +100,11 @@ class SystemLoader {
     }
     
     private func loadJavascriptSource(assetPath: String) {
-        if let content = readSourceFile(assetPath, buildPath: "", fileExtension: "js") {
+        if let content = Utils.readSourceFile(self.bundle, assetsRoot: self.assetsRoot, assetPath: assetPath, buildPath: "", fileExtension: "js") {
             self.jsContext?.evaluateScript(content)
         } else {
             DebugLogger.log("<< Could not load file: \(assetPath)")
         }
-    }
-    
-    private func getSourceMetaData(assetPath: String, buildPath: String) -> (String, String) {
-        var sourceName: String
-        var directory: String
-        // seperate the folder path and the file name of the asset
-        if assetPath.rangeOfString("/") != nil {
-            var pathComponents = assetPath.componentsSeparatedByString("/")
-            sourceName = pathComponents.last!
-            pathComponents.removeLast()
-            directory = self.assetsRoot + buildPath + pathComponents.joinWithSeparator("/")
-        } else {
-            sourceName = assetPath
-            directory = self.assetsRoot + buildPath
-        }
-        
-        // remove file extension
-        if SystemLoader.endsWith(sourceName, suffix:".js") {
-            sourceName = sourceName.stringByReplacingOccurrencesOfString(".js", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        }
-        
-        return (sourceName, directory)
-    }
-    
-    private static func endsWith(string: String, suffix: String) -> Bool {
-        // rangeOfString returns nil if other is empty, destroying the analogy with (ordered) sets.
-        if suffix.isEmpty {
-            return true
-        }
-        if let range = string.rangeOfString(suffix,
-                                          options: [NSStringCompareOptions.AnchoredSearch, NSStringCompareOptions.BackwardsSearch]) {
-            return range.endIndex == string.endIndex
-        }
-        return false
     }
 
 }

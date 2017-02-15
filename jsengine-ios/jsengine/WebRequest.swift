@@ -12,24 +12,31 @@ import JavaScriptCore
 public class WebRequest {
     weak var jsContext: JSContext? = nil
     var tabs = NSMapTable.strongToWeakObjectsMapTable()
+    var webRequest: JSValue?
+    var bundle: NSBundle
     
-    init() {
-        
+    init(bundle: NSBundle) {
+        self.bundle = bundle
     }
     
     func extend(context: JSContext) {
         self.jsContext = context
-        let webRequest = JSValue.init(newObjectInContext: context)
-        
         let nativeIsWindowActive: @convention(block) (Int) -> Bool = {[weak self] tabId in
             if let tabActive = self?.isTabActive(tabId) {
                 return tabActive
             }
             return false
         }
-        webRequest.setObject(unsafeBitCast(nativeIsWindowActive, AnyObject.self), forKeyedSubscript: "_nativeIsWindowActive")
+        context.setObject(unsafeBitCast(nativeIsWindowActive, AnyObject.self), forKeyedSubscript: "_nativeIsWindowActive")
         
-        context.setObject(webRequest, forKeyedSubscript: "webRequest")
+        if let content = Utils.readSourceFile(self.bundle, assetsRoot: "assets", assetPath: "webrequest", buildPath: "", fileExtension: "js") {
+            self.jsContext!.evaluateScript(content)
+        } else {
+            DebugLogger.log("<< Could not load file: webrequest.js")
+        }
+        
+        self.webRequest = self.jsContext?.evaluateScript("webRequest")
+
     }
     
     func shouldBlockRequest(request: NSURLRequest) -> Bool {
@@ -61,11 +68,12 @@ public class WebRequest {
     
     //MARK: - Private Methods
     
-    private func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
-        
-        if let requestInfoJsonString = toJSONString(requestInfo) {
-            let onBeforeRequestCall = "System.get('platform/webrequest').default.onBeforeRequest._trigger(\(requestInfoJsonString));"
-            let blockResponse = self.jsContext?.evaluateScript(onBeforeRequestCall).toDictionary()
+    func getBlockResponseForRequest(requestInfo: [String: AnyObject]) -> [NSObject : AnyObject]? {
+
+        if let onBeforeRequest = self.webRequest?.valueForProperty("onBeforeRequest") {
+            
+            let blockResponse = onBeforeRequest.invokeMethod("_trigger", withArguments: [requestInfo])?.toDictionary()
+            
             return blockResponse
         }
         return nil

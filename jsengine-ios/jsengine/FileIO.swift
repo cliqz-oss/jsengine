@@ -62,7 +62,7 @@ class FileIO {
             } else {
                 callback.callWithArguments([content])
             }
-        } catch let error as NSError {
+        } catch _ as NSError {
             // files does not exist, do no thing
             callback.callWithArguments(nil)
         }
@@ -70,11 +70,27 @@ class FileIO {
     
     func writeFile(path: String, data: String) {
         let p = self.documentDirectory
-        let filePathURL = NSURL(fileURLWithPath: p).URLByAppendingPathComponent(path)
-        do {
-            try data.writeToURL(filePathURL!, atomically: true, encoding: NSUTF8StringEncoding)
-        } catch let error as NSError {
-            print("WriteFile Failed: ---- \(error)")
+        if let filePathURL = NSURL(fileURLWithPath: p).URLByAppendingPathComponent(path) {
+            let containingDirectory = filePathURL.URLByDeletingLastPathComponent
+            createDirectoryIfNotExist(containingDirectory)
+            do {
+                try data.writeToURL(filePathURL, atomically: true, encoding: NSUTF8StringEncoding)
+            } catch let error as NSError {
+                print("WriteFile Failed: ---- \(error)")
+            }
+        }
+        
+    }
+    private func createDirectoryIfNotExist(directoryURL: NSURL?){
+        let fileManager = NSFileManager.defaultManager()
+        
+        if let path = directoryURL?.path where fileManager.fileExistsAtPath(path) == false {
+            do {
+                try fileManager.createDirectoryAtPath(path, withIntermediateDirectories: true, attributes: nil)
+            } catch let error as NSError {
+                //TODO log error here
+                NSLog("Could not create directory at path:\(path) because of the following error: \(error.debugDescription)")
+            }
         }
     }
     
