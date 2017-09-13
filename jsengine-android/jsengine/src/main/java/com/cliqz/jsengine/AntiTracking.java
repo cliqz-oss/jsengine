@@ -81,14 +81,12 @@ public class AntiTracking {
         return new JSONObject();
     }
 
-    public boolean isWhitelisted(final String url) {
+    public boolean isWhitelisted(final String url) throws TimeoutException {
         try {
             final Object whitelisted = engine.system.callFunctionOnModuleDefault(50, MODULE_NAME + "/attrack", "isSourceWhitelisted", url);
             return whitelisted.equals(Boolean.TRUE);
         } catch (ExecutionException e) {
             Log.e(TAG, "isWhitelisted", e);
-        } catch (TimeoutException e) {
-            return true;
         }
         return false;
     }
