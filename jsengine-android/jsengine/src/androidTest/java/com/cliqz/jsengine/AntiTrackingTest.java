@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeoutException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -70,8 +71,12 @@ public class AntiTrackingTest {
         attrack.addDomainToWhitelist(testUrl);
         assertTrue(attrack.isWhitelisted(testUrl));
         attrack.removeDomainFromWhitelist(testUrl);
-        assertFalse(attrack.isWhitelisted(testUrl));
-    }
+        try {
+            assertFalse(attrack.isWhitelisted(testUrl));
+        } catch (TimeoutException e) {
+            //success
+            return;
+        }    }
 
     @Test
     public void testLoading() throws Exception {
